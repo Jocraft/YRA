@@ -1,5 +1,5 @@
 # Youth Road Analyzer 
-> a Students Learning Journey Navigator and Personalized Pathfinding System
+> Students Learning Journey Navigator and Personalized Pathfinding System
 
 ## Problem Statement
 
