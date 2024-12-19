@@ -32,22 +32,6 @@
                 <h5><a href="{{ object.get_absolute_url }}"><b>{{ object }}</b></a></h5>
                 <p>{{ object.summary }}</p>
             </div><hr>
-            
-        {% elif klass == "NewsAndEvents" %}
-            <div class="col-12 class-item">
-                <span class="bg-secondary text-light small px-2 rounded-pill">{% trans 'News And Events' %}</span>
-                <p><b>{% trans 'Date:' %} </b> {{ object.updated_date|timesince }} ago</p>
-                <h5><a href="{{ object.get_absolute_url }}"><b>{{ object.title }}</b></a></h5>
-                <p>{{ object.summary }}</p>
-            </div><hr>
-
-        {% elif klass == "Quiz" %}
-            <div class="col-12 class-item">
-                <span class="bg-secondary text-light small px-2 rounded-pill">{% trans 'Quiz' %}</span>
-                <p>{{ object.category }} {% trans 'quiz' %},  <b>{% trans 'Course:' %}</b> {{ object.course }}</p>
-                <h5><a href="{{ object.get_absolute_url }}"><b>{{ object.title }}</b></a></h5>
-                <p>{{ object.description }}</p>
-            </div><hr>
 
         {% else %}
             <div class="col-12 col-lg-8 offset-lg-4">
@@ -86,8 +70,6 @@
     <ul class="pl-3">
         <li>{% trans 'Program' %} <span class="text-orange">&gt;</span> {% trans 'Title or Description' %}</li>
         <li>{% trans 'Course' %} <span class="text-orange">&gt;</span>{% trans 'Title, Code or Description' %}</li>
-        <li>{% trans 'News And Events' %} <span class="text-orange">&gt;</span> {% trans 'Title, Description or just by typing news or event' %}li>
-        <li>{% trans 'Quiz' %} <span class="text-orange">&gt;</span>{% trans 'Title, Description or Category(practice, assignment and exam)' %}</li>
     </ul>
     </div>
 </div>

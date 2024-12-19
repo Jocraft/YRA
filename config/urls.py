@@ -24,7 +24,6 @@ urlpatterns += i18n_patterns(
     path("programs/", include("course.urls")),
     path("result/", include("result.urls")),
     path("search/", include("search.urls")),
-    path("quiz/", include("quiz.urls")),
 )
 
 

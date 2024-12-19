@@ -79,31 +79,7 @@ class TakenCourse(models.Model):
     course = models.ForeignKey(
         Course, on_delete=models.CASCADE, related_name="taken_courses"
     )
-    assignment = models.DecimalField(
-        max_digits=5, decimal_places=2, default=Decimal("0.00")
-    )
-    mid_exam = models.DecimalField(
-        max_digits=5, decimal_places=2, default=Decimal("0.00")
-    )
-    quiz = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal("0.00"))
-    attendance = models.DecimalField(
-        max_digits=5, decimal_places=2, default=Decimal("0.00")
-    )
-    final_exam = models.DecimalField(
-        max_digits=5, decimal_places=2, default=Decimal("0.00")
-    )
-    total = models.DecimalField(
-        max_digits=5, decimal_places=2, default=Decimal("0.00"), editable=False
-    )
-    grade = models.CharField(
-        choices=GRADE_CHOICES, max_length=2, blank=True, editable=False
-    )
-    point = models.DecimalField(
-        max_digits=5, decimal_places=2, default=Decimal("0.00"), editable=False
-    )
-    comment = models.CharField(
-        choices=COMMENT_CHOICES, max_length=200, blank=True, editable=False
-    )
+
 
     def get_absolute_url(self):
         return reverse("course_detail", kwargs={"slug": self.course.slug})
