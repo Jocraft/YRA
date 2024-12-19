@@ -59,7 +59,6 @@ PROJECT_APPS = [
     "core.apps.CoreConfig",
     "accounts.apps.AccountsConfig",
     "course.apps.CourseConfig",
-    "result.apps.ResultConfig",
     "search.apps.SearchConfig",
 ]
 

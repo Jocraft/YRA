@@ -22,7 +22,6 @@ from accounts.forms import (
 from accounts.models import Parent, Student, User
 from core.models import Semester, Session
 from course.models import Course
-from result.models import TakenCourse
 
 # ########################################################
 # Utility Functions
