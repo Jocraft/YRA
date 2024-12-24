@@ -10,12 +10,10 @@ from course.models import Program
 from .validators import ASCIIUsernameValidator
 
 
-# LEVEL_COURSE = "Level course"
 BACHELOR_DEGREE = _("Bachelor")
 MASTER_DEGREE = _("Master")
 
 LEVEL = (
-    # (LEVEL_COURSE, "Level course"),
     (BACHELOR_DEGREE, _("Bachelor Degree")),
     (MASTER_DEGREE, _("Master Degree")),
 )
@@ -38,6 +36,49 @@ RELATION_SHIP = (
     (OTHER, _("Other")),
 )
 
+GENDERS = ((_("M"), _("Male")), (_("F"), _("Female")))
+
+# -----------------------------
+# CHOICE LISTS FOR SINGLE FIELDS
+# -----------------------------
+NATIONALITIES = [
+    ("Egyption", _("Egyption")),
+    ("american", _("American")),
+    ("british", _("British")),
+    ("canadian", _("Canadian")),
+    ("other", _("Other")),
+]
+
+ETHNICITIES = [
+    ("asian", _("Asian")),
+    ("black", _("Black")),
+    ("hispanic", _("Hispanic")),
+    ("white", _("White")),
+    ("other", _("Other")),
+]
+
+RELIGIONS = [
+    ("christian", _("Christianity")),
+    ("muslim", _("Islam")),
+    ("jewish", _("Judaism")),
+    ("hindu", _("Hinduism")),
+    ("buddhist", _("Buddhism")),
+    ("other", _("Other / Prefer not to say")),
+]
+
+# -----------------------------
+# LIST FOR MULTIPLE LANGUAGES
+# (Will be used in forms.py)
+# -----------------------------
+LANGUAGES = [
+    ("english", _("English")),
+    ("french", _("French")),
+    ("spanish", _("Spanish")),
+    ("arabic", _("Arabic")),
+    ("mandarin", _("Mandarin")),
+    ("other", _("Other")),
+]
+
 
 class CustomUserManager(UserManager):
     def search(self, query=None):
@@ -49,9 +90,7 @@ class CustomUserManager(UserManager):
                 | Q(last_name__icontains=query)
                 | Q(email__icontains=query)
             )
-            queryset = queryset.filter(
-                or_lookup
-            ).distinct()  # distinct() is often necessary with Q lookups
+            queryset = queryset.filter(or_lookup).distinct()
         return queryset
 
     def get_student_count(self):
@@ -64,14 +103,12 @@ class CustomUserManager(UserManager):
         return self.model.objects.filter(is_superuser=True).count()
 
 
-GENDERS = ((_("M"), _("Male")), (_("F"), _("Female")))
-
-
 class User(AbstractUser):
     is_student = models.BooleanField(default=False)
     is_lecturer = models.BooleanField(default=False)
     is_parent = models.BooleanField(default=False)
     is_dep_head = models.BooleanField(default=False)
+
     gender = models.CharField(max_length=1, choices=GENDERS, blank=True, null=True)
     phone = models.CharField(max_length=60, blank=True, null=True)
     address = models.CharField(max_length=60, blank=True, null=True)
@@ -79,6 +116,25 @@ class User(AbstractUser):
         upload_to="profile_pictures/%y/%m/%d/", default="default.png", null=True
     )
     email = models.EmailField(blank=True, null=True)
+
+    # Single-choice fields with predefined lists
+    nationality = models.CharField(
+        max_length=100, choices=NATIONALITIES, blank=True, null=True
+    )
+    ethnicity = models.CharField(
+        max_length=100, choices=ETHNICITIES, blank=True, null=True
+    )
+    religion = models.CharField(
+        max_length=100, choices=RELIGIONS, blank=True, null=True
+    )
+
+    # Single text field to store comma-separated languages for multi-select
+    languages_spoken = models.CharField(max_length=255, blank=True, null=True)
+
+    # Additional fields
+    national_id = models.CharField(max_length=50, blank=True, null=True)
+    enrollment_date = models.DateField(blank=True, null=True)
+    expected_graduation_date = models.DateField(blank=True, null=True)
 
     username_validator = ASCIIUsernameValidator()
 
@@ -100,15 +156,13 @@ class User(AbstractUser):
     @property
     def get_user_role(self):
         if self.is_superuser:
-            role = _("Admin")
+            return _("Admin")
         elif self.is_student:
-            role = _("Student")
+            return _("Student")
         elif self.is_lecturer:
-            role = _("Lecturer")
+            return _("Lecturer")
         elif self.is_parent:
-            role = _("Parent")
-
-        return role
+            return _("Parent")
 
     def get_picture(self):
         try:
@@ -122,6 +176,7 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+        # Resize the picture if too large
         try:
             img = Image.open(self.picture.path)
             if img.height > 300 or img.width > 300:
@@ -142,15 +197,12 @@ class StudentManager(models.Manager):
         qs = self.get_queryset()
         if query is not None:
             or_lookup = Q(level__icontains=query) | Q(program__icontains=query)
-            qs = qs.filter(
-                or_lookup
-            ).distinct()  # distinct() is often necessary with Q lookups
+            qs = qs.filter(or_lookup).distinct()
         return qs
 
 
 class Student(models.Model):
     student = models.OneToOneField(User, on_delete=models.CASCADE)
-    # id_number = models.CharField(max_length=20, unique=True, blank=True)
     level = models.CharField(max_length=25, choices=LEVEL, null=True)
     program = models.ForeignKey(Program, on_delete=models.CASCADE, null=True)
 
@@ -166,13 +218,13 @@ class Student(models.Model):
     def get_gender_count(cls):
         males_count = Student.objects.filter(student__gender="M").count()
         females_count = Student.objects.filter(student__gender="F").count()
-
         return {"M": males_count, "F": females_count}
 
     def get_absolute_url(self):
         return reverse("profile_single", kwargs={"user_id": self.id})
 
     def delete(self, *args, **kwargs):
+        # Deleting the student also deletes the associated User.
         self.student.delete()
         super().delete(*args, **kwargs)
 
@@ -180,7 +232,7 @@ class Student(models.Model):
 class Parent(models.Model):
     """
     Connect student with their parent, parents can
-    only view their connected students information
+    only view their connected student's information
     """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -189,9 +241,6 @@ class Parent(models.Model):
     last_name = models.CharField(max_length=120)
     phone = models.CharField(max_length=60, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
-
-    # What is the relationship between the student and
-    # the parent (i.e. father, mother, brother, sister)
     relation_ship = models.TextField(choices=RELATION_SHIP, blank=True)
 
     class Meta:

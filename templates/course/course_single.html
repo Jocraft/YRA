@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block title %}{{ title }} | {% trans 'Learning management system' %}{% endblock title %}
+{% block title %}{{ title }} | {% trans 'Youth Road Analyzer' %}{% endblock title %}
 {% load static %}
 
 {% block content %}
@@ -34,11 +34,6 @@
                 {% trans 'Upload new video' %}
             </a>
             {% endif %}
-        </div>
-        <div class="ms-auto">
-            <a class="btn btn-sm btn-warning" href="{% url 'quiz_index' course.slug %}"><i class="fas fa-list"></i>
-                {% trans 'Take a Quiz' %}
-            </a>
         </div>
     </div>
 </div>

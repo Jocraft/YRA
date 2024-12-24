@@ -25,9 +25,11 @@
 *,
 body {
   font-family: "Rubik", sans-serif;
+  color:#fff;
 }
 body {
-  background-color: #f3f2f2;
+  background-color: #202e4b;
+  color: #fff;
 }
 
 /* width */
@@ -160,6 +162,7 @@ video {
   //--//-->   Top Navigation
   ======================================*/
 #top-navbar {
+  color:#fff;
   position: fixed;
   top: 0;
   right: 0;
@@ -167,7 +170,7 @@ video {
   -webkit-margin-start: -10px;
   z-index: 90;
   /*padding: 0.4rem 1rem;*/
-  background: #f5f5f5;
+  background: #090d16;
   box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
   transition: 0.3s;
 
@@ -197,7 +200,7 @@ video {
       cursor: pointer;
       padding: 0.2rem 0.5rem;
       &:hover {
-        background-color: #fff;
+        background-color: #0d6efd;
       }
     }
   }
@@ -296,6 +299,8 @@ video {
 /* #################################################################### */
 
 .avatar {
+  background-color: #618ae2;
+  color:#fff;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -323,10 +328,12 @@ video {
   ======================================*/
 
 .dropdown-menu {
+  background-color: #fff;;
   box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.3);
   // transform-origin: top;
   // animation: grow-top 0.2s ease-in-out forwards;
   .dropdown-item {
+    color:#fff;
     padding-top: 8px;
     padding-bottom: 8px;
   }
@@ -356,7 +363,7 @@ video {
   z-index: 100;
   overflow-y: auto;
   resize: horizontal;
-  background-color: #fff;
+  background-color: #131c2d;
   -webkit-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16),
     0 2px 10px 0 rgba(0, 0, 0, 0.12);
   box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16),
@@ -370,7 +377,7 @@ video {
     margin-top: 4rem;
   }
   .top-side {
-    background: #f5f5f5;
+    background: #515151;
     -webkit-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
     -moz-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
     box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
@@ -692,7 +699,7 @@ video {
   bottom: 0;
   z-index: 9999;
   overflow: hidden;
-  background: #fff;
+  background: #2c4065;
 }
 /* ############################################################### */
 /* loader */
@@ -1010,6 +1017,7 @@ video {
   align-items: center;
   justify-content: center;
   .text-right {
+    color: #fff;
     display: flex;
     flex-direction: row-reverse;
     align-items: flex-end;
@@ -1026,6 +1034,7 @@ video {
     align-items: center;
     justify-content: space-between;
     .text-right {
+      color:#fff;
       display: block;
       text-align: end;
       h2 {
@@ -1046,7 +1055,7 @@ video {
   position: relative;
   padding: 1rem;
   transition: 0.5s;
-  background-color: #fff;
+  background-color: #2c4065;
   border-radius: 10px;
 }
 
@@ -1083,7 +1092,7 @@ video {
   z-index: 999;
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
-  background-color: #fff;
+  background-color: #202e4b;
   /* For Internet Explorer */
   box-shadow: 0 0 0 10000px rgba(0, 0, 0, 0.5) !important;
   /* For other browsers */
@@ -1113,7 +1122,7 @@ video {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #fff;
+  background-color: #2c4065;
 }
 
 .users-count .card-count h2 {
@@ -1253,4 +1262,7 @@ video {
     text-decoration: none;
     transition: 0.5s;
   }
+}
+.card{
+  background-color: #2c4065;
 }
