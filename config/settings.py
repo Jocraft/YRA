@@ -59,7 +59,9 @@ PROJECT_APPS = [
     "core.apps.CoreConfig",
     "accounts.apps.AccountsConfig",
     "course.apps.CourseConfig",
-    "search.apps.SearchConfig",
+    "search.apps.SearchConfig",    
+    'analysis.apps.AnalysisConfig',
+
 ]
 
 # Combine all apps

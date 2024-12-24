@@ -53,8 +53,14 @@
 			<li class="{% if request.path == pro %}active{% endif %}">
 				<a href="{% url 'programs' %}"><i class="fas fa-book-open"></i>{% trans 'Programs & Courses' %}</a>
 			</li>
-			{% endif %}
 
+			{% endif %}
+			{% if request.user.is_superuser  %}
+			<li class="{% if request.path == pro %}active{% endif %}">
+				<a href="{% url 'analysis' %}"><i class="fas fa-chart-line"></i>{% trans 'Analysis' %}</a>
+			</li>
+
+			{% endif %}
 
 
 

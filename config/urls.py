@@ -23,6 +23,8 @@ urlpatterns += i18n_patterns(
     path("accounts/", include("accounts.urls")),
     path("programs/", include("course.urls")),
     path("search/", include("search.urls")),
+    path('analysis/', include('analysis.urls')),
+
 )
 
 
