@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block title %}{{ title }} | {% trans 'Learning management system' %}{% endblock title %}
+{% block title %}{{ title }} | {% trans 'Youth Road Analyzer' %}{% endblock title %}
 {% load static %}
 
 {% block content %}
@@ -20,7 +20,7 @@
 {% include 'snippets/messages.html' %}
 
 <div>
-    <div class="title-1">{% trans 'News' %} &amp; {% trans 'Events' %}</div>
+    <div class="title-1">{% trans 'News' %} &amp; {% trans 'Notes' %}</div>
 </div>
 
 <div class="col-md-2 ms-auto d-flex">
@@ -28,7 +28,7 @@
         <span class="color-indicator bg-primary"></span> {% trans 'News' %}
     </div>
     <div>
-        <span class="color-indicator bg-purple"></span> {% trans 'Events' %}
+        <span class="color-indicator bg-purple"></span> {% trans 'Notes' %}
     </div>
 </div>
 
@@ -38,7 +38,7 @@
         {% for item in items %}
         <div class="col-md-4 mb-4">
             <div class="bg-white border">
-                <div class="card-header-ne {% if item.posted_as == 'News' %}{% trans 'news' %}{% else %}{% trans 'events' %}{% endif %} p-2">
+                <div class="card-header-ne {% if item.posted_as == 'News' %}{% trans 'news' %}{% else %}{% trans 'Notes' %}{% endif %} p-2">
                     <span class="p-0">
                         {{ item.title|title }}
                     </span>
@@ -71,7 +71,7 @@
 
     {% else %}
     <h4 class="text-center mt-5 py-5 text-muted">
-        <i class="fa-regular fa-folder-open me-2"></i>{% trans 'School news and events will appear here.' %}
+        <i class="fa-regular fa-folder-open me-2"></i>{% trans 'Academy news and Notes will appear here.' %}
     </h4>
 
     {% endif %}

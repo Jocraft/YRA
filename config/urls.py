@@ -22,10 +22,9 @@ urlpatterns += i18n_patterns(
     ),  # Django JET dashboard URLS
     path("accounts/", include("accounts.urls")),
     path("programs/", include("course.urls")),
-    path("result/", include("result.urls")),
     path("search/", include("search.urls")),
-    path("quiz/", include("quiz.urls")),
-    path("payments/", include("payments.urls")),
+    path('analysis/', include('analysis.urls')),
+
 )
 
 
