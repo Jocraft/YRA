@@ -4,11 +4,11 @@ from django.utils.translation import gettext_lazy as _
 
 
 NEWS = _("News")
-EVENTS = _("Notes")
+EVENTS = _("Event")
 
 POST = (
     (NEWS, _("News")),
-    (EVENTS, _("Notes")),
+    (EVENTS, _("Event")),
 )
 
 FIRST = _("First")
