@@ -22,10 +22,15 @@ from accounts.forms import (
 from accounts.models import Parent, Student, User
 from core.models import Semester, Session
 from course.models import Course
-# from course.models import TakenCourse  # If you have a TakenCourse model
+from result.models import TakenCourse
+
+# ########################################################
+# Utility Functions
+# ########################################################
 
 
 def render_to_pdf(template_name, context):
+    """Render a given template to PDF format."""
     response = HttpResponse(content_type="application/pdf")
     response["Content-Disposition"] = 'filename="profile.pdf"'
     template = render_to_string(template_name, context)
@@ -33,6 +38,11 @@ def render_to_pdf(template_name, context):
     if pdf.err:
         return HttpResponse("We had some problems generating the PDF")
     return response
+
+
+# ########################################################
+# Authentication and Registration
+# ########################################################
 
 
 def validate_username(request):
@@ -56,8 +66,14 @@ def register(request):
     return render(request, "registration/register.html", {"form": form})
 
 
+# ########################################################
+# Profile Views
+# ########################################################
+
+
 @login_required
 def profile(request):
+    """Show profile of the current user."""
     current_session = Session.objects.filter(is_current_session=True).first()
     current_semester = Semester.objects.filter(
         is_current_semester=True, session=current_session
@@ -79,8 +95,9 @@ def profile(request):
     if request.user.is_student:
         student = get_object_or_404(Student, student__pk=request.user.id)
         parent = Parent.objects.filter(student=student).first()
-        # If you have a TakenCourse model, you can fetch courses here
-        courses = []
+        courses = TakenCourse.objects.filter(
+            student__student__id=request.user.id, course__level=student.level
+        )
         context.update(
             {
                 "parent": parent,
@@ -99,6 +116,7 @@ def profile(request):
 @login_required
 @admin_required
 def profile_single(request, user_id):
+    """Show profile of any selected user."""
     if request.user.id == user_id:
         return redirect("profile")
 
@@ -127,7 +145,9 @@ def profile_single(request, user_id):
         )
     elif user.is_student:
         student = get_object_or_404(Student, student__pk=user_id)
-        courses = []
+        courses = TakenCourse.objects.filter(
+            student__student__id=user_id, course__level=student.level
+        )
         context.update(
             {
                 "user_type": "Student",
@@ -148,6 +168,11 @@ def profile_single(request, user_id):
 @admin_required
 def admin_panel(request):
     return render(request, "setting/admin_panel.html", {"title": "Admin Panel"})
+
+
+# ########################################################
+# Settings Views
+# ########################################################
 
 
 @login_required
@@ -177,6 +202,11 @@ def change_password(request):
     else:
         form = PasswordChangeForm(request.user)
     return render(request, "setting/password_change.html", {"form": form})
+
+
+# ########################################################
+# Staff (Lecturer) Views
+# ########################################################
 
 
 @login_required
@@ -259,9 +289,10 @@ def delete_staff(request, pk):
     return redirect("lecturer_list")
 
 
-# -------------------------
+# ########################################################
 # Student Views
-# -------------------------
+# ########################################################
+
 
 @login_required
 @admin_required
@@ -289,12 +320,6 @@ def student_add_view(request):
 @login_required
 @admin_required
 def edit_student(request, pk):
-    """
-    Allows Admin to edit an existing student user, including:
-    - Basic info (first_name, last_name, etc.)
-    - nationality, ethnicity, religion
-    - languages_spoken (multiple-choice)
-    """
     student_user = get_object_or_404(User, is_student=True, pk=pk)
     if request.method == "POST":
         form = ProfileUpdateForm(request.POST, request.FILES, instance=student_user)
@@ -370,6 +395,11 @@ def edit_student_program(request, pk):
         "accounts/edit_student_program.html",
         {"title": "Edit Program", "form": form, "student": student},
     )
+
+
+# ########################################################
+# Parent Views
+# ########################################################
 
 
 @method_decorator([login_required, admin_required], name="dispatch")
