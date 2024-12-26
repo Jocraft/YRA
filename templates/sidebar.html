@@ -24,7 +24,8 @@
 		{% url 'programs' as pro %} {% url 'session_list' as sess %} {% url 'semester_list' as sem %}
 		{% url 'course_registration' as cr %} {% url 'edit_profile' as ep %} {% url 'change_password' as cp %}
 		{% url 'admin_panel' as admin_p %}
-		
+		{% url 'analysis' as analysis %}
+
 
 
 		<ul>
@@ -56,7 +57,7 @@
 
 			{% endif %}
 			{% if request.user.is_superuser  %}
-			<li class="{% if request.path == pro %}active{% endif %}">
+			<li class="{% if request.path == analysis %}active{% endif %}">
 				<a href="{% url 'analysis' %}"><i class="fas fa-chart-line"></i>{% trans 'Analysis' %}</a>
 			</li>
 

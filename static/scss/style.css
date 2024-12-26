@@ -298,7 +298,7 @@ video {
   box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.3);
 }
 .dropdown-menu .dropdown-item {
-  color: #fff;
+  color: #000000;
   padding-top: 8px;
   padding-bottom: 8px;
 }
@@ -1193,4 +1193,105 @@ video {
 
 .card {
   background-color: #2c4065;
+}
+
+.analysis-page {
+  padding: 2rem;
+  background-color: #2c4065; /* Subtle background */
+  min-height: 100vh;
+  /* Plot container */
+  /* Statistics list */
+}
+.analysis-page .analysis-title {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #fff; /* White text */
+  font-weight: 700; /* Bold font weight */
+}
+.analysis-page .analysis-form {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+.analysis-page .analysis-form .form-group {
+  margin-bottom: 1rem;
+  /* Adjust for your actual form fields (select, input, etc.) */
+}
+.analysis-page .analysis-form .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #555;
+}
+.analysis-page .analysis-form .form-group select,
+.analysis-page .analysis-form .form-group input[type=text],
+.analysis-page .analysis-form .form-group input[type=number] {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.analysis-page .analysis-form .analysis-button {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #1976d2;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.analysis-page .analysis-form .analysis-button:hover {
+  background-color: #1565c0;
+}
+.analysis-page .analysis-section {
+  margin-bottom: 2rem;
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.analysis-page .analysis-section .analysis-subtitle {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #444;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.5rem;
+}
+.analysis-page .analysis-plot-container {
+  background-color: #fafafa;
+  padding: 1rem;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+.analysis-page .analysis-statistics-list,
+.analysis-page .analysis-values-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.analysis-page .analysis-statistics-list li,
+.analysis-page .analysis-values-list li {
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+.analysis-page .analysis-statistics-list li strong,
+.analysis-page .analysis-values-list li strong {
+  color: #333;
+}
+.analysis-page .analysis-statistics-list li .analysis-sublist,
+.analysis-page .analysis-values-list li .analysis-sublist {
+  margin-top: 0.5rem;
+  margin-left: 1.5rem;
+  list-style: circle;
+}
+
+/* Force the text in <select> and its <option>s to be black */
+select,
+select option {
+  color: #000 !important;
 }/*# sourceMappingURL=style.css.map */
