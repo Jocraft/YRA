@@ -17,6 +17,7 @@ from .models import (
     ETHNICITIES,
     RELIGIONS,
     LANGUAGES,
+    FACULTIES,
 )
 
 
@@ -121,6 +122,14 @@ class StaffAddForm(UserCreationForm):
         required=False,
     )
 
+    # --- NEW FIELD: Faculty ---
+    faculty = forms.ChoiceField(
+        choices=FACULTIES,
+        required=False,
+        widget=forms.Select(attrs={"class": "browser-default custom-select form-control"}),
+        label="Faculty",
+    )
+
     class Meta(UserCreationForm.Meta):
         model = User
 
@@ -133,6 +142,8 @@ class StaffAddForm(UserCreationForm):
         user.phone = self.cleaned_data.get("phone")
         user.address = self.cleaned_data.get("address")
         user.email = self.cleaned_data.get("email")
+        # Save the faculty field
+        user.faculty = self.cleaned_data.get("faculty")
 
         if commit:
             user.save()
@@ -297,6 +308,14 @@ class StudentAddForm(UserCreationForm):
         help_text="Select one or more languages (hold CTRL or CMD to select multiple)",
     )
 
+    # --- NEW FIELD: Faculty ---
+    faculty = forms.ChoiceField(
+        choices=FACULTIES,
+        required=False,
+        widget=forms.Select(attrs={"class": "browser-default custom-select form-control"}),
+        label="Faculty",
+    )
+
     class Meta(UserCreationForm.Meta):
         model = User
 
@@ -313,7 +332,10 @@ class StudentAddForm(UserCreationForm):
         user.phone = self.cleaned_data.get("phone")
         user.email = self.cleaned_data.get("email")
 
-        # New fields
+        # Save the new faculty field
+        user.faculty = self.cleaned_data.get("faculty")
+
+        # Additional new fields
         user.nationality = self.cleaned_data.get("nationality")
         user.national_id = self.cleaned_data.get("national_id")
         user.enrollment_date = self.cleaned_data.get("enrollment_date")
@@ -339,7 +361,7 @@ class StudentAddForm(UserCreationForm):
 class ProfileUpdateForm(UserChangeForm):
     """
     Used for editing an existing user (Student, Staff, etc.).
-    Now includes the extra fields (nationality, ethnicity, religion, languages_spoken).
+    Now includes the extra fields (faculty, nationality, ethnicity, religion, languages_spoken).
     """
 
     # Basic fields
@@ -417,7 +439,7 @@ class ProfileUpdateForm(UserChangeForm):
         label="Religion",
     )
 
-    # --- NEW FIELD: National ID, enrollment, etc. ---
+    # --- NEW FIELDS: ID, enrollment, etc. ---
     national_id = forms.CharField(
         max_length=50,
         required=False,
@@ -445,6 +467,14 @@ class ProfileUpdateForm(UserChangeForm):
         label="Languages Spoken",
     )
 
+    # --- NEW FIELD: Faculty ---
+    faculty = forms.ChoiceField(
+        choices=FACULTIES,
+        required=False,
+        widget=forms.Select(attrs={"class": "browser-default custom-select form-control"}),
+        label="Faculty",
+    )
+
     class Meta:
         model = User
         fields = [
@@ -461,8 +491,7 @@ class ProfileUpdateForm(UserChangeForm):
             "national_id",
             "enrollment_date",
             "expected_graduation_date",
-            # languages_spoken won't be stored as a single field in DB
-            # but we handle it in save()
+            "faculty",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -480,6 +509,9 @@ class ProfileUpdateForm(UserChangeForm):
         # Convert multiple choice (list) back into a comma string
         selected_langs = self.cleaned_data.get("languages_spoken", [])
         user.languages_spoken = ",".join(selected_langs)
+
+        # Make sure faculty is saved
+        user.faculty = self.cleaned_data.get("faculty")
 
         if commit:
             user.save()

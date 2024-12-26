@@ -10,13 +10,26 @@ from course.models import Program
 from .validators import ASCIIUsernameValidator
 
 
+# Defining degree levels
 BACHELOR_DEGREE = _("Bachelor")
 MASTER_DEGREE = _("Master")
+ASSOCIATE_DEGREE = _("Associate")
+DOCTORATE_DEGREE = _("Doctorate")
+DIPLOMA = _("Diploma")
+HIGH_SCHOOL = _("High School")
+MIDDLE_SCHOOL = _("Middle School")
 
+# Creating the LEVEL tuple
 LEVEL = (
+    (HIGH_SCHOOL, _("High School")),
+    (MIDDLE_SCHOOL, _("Middle School")),
+    (ASSOCIATE_DEGREE, _("Associate Degree")),
     (BACHELOR_DEGREE, _("Bachelor Degree")),
+    (DIPLOMA, _("Diploma")),
     (MASTER_DEGREE, _("Master Degree")),
+    (DOCTORATE_DEGREE, _("Doctorate Degree")),
 )
+
 
 FATHER = _("Father")
 MOTHER = _("Mother")
@@ -79,6 +92,42 @@ LANGUAGES = [
     ("other", _("Other")),
 ]
 
+# Define faculties and institutes
+FACULTIES = [
+    ("None", _("None")),
+    ("Faculty of Arts", _("Faculty of Arts")),
+    ("Faculty of Science", _("Faculty of Science")),
+    ("Faculty of Engineering", _("Faculty of Engineering")),
+    ("Faculty of Medicine", _("Faculty of Medicine")),
+    ("Faculty of Agriculture", _("Faculty of Agriculture")),
+    ("Faculty of Law", _("Faculty of Law")),
+    ("Faculty of Commerce", _("Faculty of Commerce")),
+    ("Faculty of Education", _("Faculty of Education")),
+    ("Faculty of Veterinary Medicine", _("Faculty of Veterinary Medicine")),
+    ("Faculty of Dentistry", _("Faculty of Dentistry")),
+    ("Faculty of Pharmacy", _("Faculty of Pharmacy")),
+    ("Faculty of Physical Education", _("Faculty of Physical Education")),
+    ("Faculty of Nursing", _("Faculty of Nursing")),
+    ("Faculty of Computer Science", _("Faculty of Computer Science")),
+    ("Faculty of Business Administration", _("Faculty of Business Administration")),
+    ("Faculty of Fine Arts", _("Faculty of Fine Arts")),
+    ("Faculty of Tourism and Hotels", _("Faculty of Tourism and Hotels")),
+    ("Faculty of Environmental Sciences", _("Faculty of Environmental Sciences")),
+    ("Faculty of Specific Education", _("Faculty of Specific Education")),
+    ("Faculty of Oral and Dental Medicine", _("Faculty of Oral and Dental Medicine")),
+    ("Higher Institute for Cooperative and Administrative Studies", _("Higher Institute for Cooperative and Administrative Studies")),
+    ("Intermediate Institute of Social Service", _("Intermediate Institute of Social Service")),
+    ("Institute of Administration, Secretarial Work and Computers", _("Institute of Administration, Secretarial Work and Computers")),
+    ("Higher Institute of Languages and Translation", _("Higher Institute of Languages and Translation")),
+    ("Higher Institute of Agricultural Cooperation and Guidance", _("Higher Institute of Agricultural Cooperation and Guidance")),
+    ("Higher Institute of Computers, Administrative Information and Management Science", _("Higher Institute of Computers, Administrative Information and Management Science")),
+    ("Higher Institute of Languages", _("Higher Institute of Languages")),
+    ("Egyptian Higher Institute of Tourism and Hotels", _("Egyptian Higher Institute of Tourism and Hotels")),
+    ("Higher Institute of Optic Technology", _("Higher Institute of Optic Technology")),
+    ("Institute of Specific Studies", _("Institute of Specific Studies")),
+    ("Higher Institute of Social Work", _("Higher Institute of Social Work")),
+    ("Higher Institute of Agricultural Cooperation and Guidance", _("Higher Institute of Agricultural Cooperation and Guidance"))
+]
 
 class CustomUserManager(UserManager):
     def search(self, query=None):
@@ -135,6 +184,9 @@ class User(AbstractUser):
     national_id = models.CharField(max_length=50, blank=True, null=True)
     enrollment_date = models.DateField(blank=True, null=True)
     expected_graduation_date = models.DateField(blank=True, null=True)
+
+    # New field for faculty
+    faculty = models.CharField(max_length=150, choices=FACULTIES, blank=True, null=True)
 
     username_validator = ASCIIUsernameValidator()
 
