@@ -264,8 +264,13 @@ class Student(models.Model):
         ordering = ("-student__date_joined",)
 
     def __str__(self):
-        return self.student.get_full_name
+        return self.student.get_full_name()  # Call the method with parentheses
 
+    def program_name(self):
+        if self.program:
+            return self.program.title  # Assuming title is the correct field name in Program model
+        return None
+    
     @classmethod
     def get_gender_count(cls):
         males_count = Student.objects.filter(student__gender="M").count()
