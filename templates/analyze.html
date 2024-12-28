@@ -8,65 +8,165 @@
 <div class="analysis-page">
   <h1 class="analysis-title">Data Analysis</h1>
 
-  <form class="analysis-form" method="POST">
-    {% csrf_token %}
-    <div class="form-group">
-      <label for="column">Select a Column for Analysis:</label>
-      {{ form.column }}
-    </div>
+  <div class="tabs">
+    <button id="descriptiveBtn" class="tab-button active" onclick="switchTab('descriptive')">Descriptive Analysis</button>
+    <button id="hypothesisBtn" class="tab-button" onclick="switchTab('hypothesis')">Hypothesis Testing</button>
+  </div>
 
-    <div class="form-group">
-      <label for="group_by">Group By (Optional):</label>
-      {{ form.group_by }}
-    </div>
-
-    <button class="analysis-button" type="submit">Analyze</button>
-  </form>
-
-  {% if plot_html %}
-    <div class="analysis-section analysis-plot-section">
-      <h2 class="analysis-subtitle">Plot for Selected Column</h2>
-      <div class="analysis-plot-container">
-        {{ plot_html|safe }}
+  <div id="descriptive" class="tab-content active">
+    <form class="analysis-form" method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="analysis_type" value="descriptive">
+      <div class="form-group">
+        <label for="column">Select a Column for Analysis:</label>
+        {{ form.column }}
       </div>
-    </div>
-  {% endif %}
+      <div class="form-group">
+        <label for="group_by">Group By (Optional):</label>
+        {{ form.group_by }}
+      </div>
+      <button class="analysis-button" type="submit">Analyze</button>
+    </form>
 
-  {% if statistics %}
-    <div class="analysis-section analysis-statistics-section">
-      <h2 class="analysis-subtitle">Statistics for Selected Column</h2>
-      <ul class="analysis-statistics-list">
-        {% for key, value in statistics.items %}
-          <li>
-            <strong>{{ key }}</strong>:
-            {% if value|length > 1 and value.items %}
-              <ul class="analysis-sublist">
-                {% for sub_key, sub_value in value.items %}
-                  <li>{{ sub_key }}: {{ sub_value }}</li>
-                {% endfor %}
-              </ul>
-            {% else %}
-              {{ value }}
-            {% endif %}
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-  {% endif %}
+    {% if plot_html and analysis_type != 'hypothesis' %}
+      <div class="analysis-section analysis-plot-section">
+        <h2 class="analysis-subtitle">Plot for Selected Column</h2>
+        <div class="analysis-plot-container">
+          {{ plot_html|safe }}
+        </div>
+      </div>
+    {% endif %}
 
-  {% if column_values %}
-    <div class="analysis-section analysis-values-section">
-      <h2 class="analysis-subtitle">Raw Values for Selected Column</h2>
-      <ul class="analysis-values-list">
-        {% for value in column_values %}
-          <li>{{ value }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-  {% endif %}
+    {% if statistics and analysis_type != 'hypothesis' %}
+      <div class="analysis-section analysis-statistics-section">
+        <h2 class="analysis-subtitle">Statistics for Selected Column</h2>
+        <ul class="analysis-statistics-list">
+          {% for key, value in statistics.items %}
+            <li>
+              <strong>{{ key }}</strong>:
+              {% if value|length > 1 and value.items %}
+                <ul class="analysis-sublist">
+                  {% for sub_key, sub_value in value.items %}
+                    <li>{{ sub_key }}: {{ sub_value }}</li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                {{ value }}
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if column_values and analysis_type != 'hypothesis' %}
+    {% endif %}
+  </div>
+
+  <div id="hypothesis" class="tab-content">
+    <form class="analysis-form" method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="analysis_type" value="hypothesis">
+      <div class="form-group">
+        <label for="column">Select a Column for Hypothesis Testing:</label>
+        {{ form.column }}
+      </div>
+      <button class="analysis-button" type="submit">Test Hypothesis</button>
+    </form>
+
+    {% if hypothesis_results and analysis_type == 'hypothesis' %}
+      <div class="analysis-section analysis-hypothesis-section">
+        <h2 class="analysis-subtitle">Hypothesis Testing Results</h2>
+        <p><strong>Test: </strong>{{ hypothesis_results.test }}</p>
+        <p><strong>Question: </strong>{{ hypothesis_results.question }}</p>
+        <p><strong>p-value: </strong>{{ hypothesis_results.p_value }}</p>
+        <p><strong>Result: </strong>{{ hypothesis_results.result }}</p>
+        
+      </div>
+    {% endif %}
+  </div>
 </div>
-{% endblock content %}
 
-{% block js %}
-  <!-- Add any specific JavaScript needed here -->
-{% endblock js %}
+<style>
+.tabs {
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.tab-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-weight: 500;
+  color: #6b7280;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+
+.tab-button.active {
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.analysis-form {
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.analysis-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+.analysis-hypothesis-section {
+  color: black !important;
+}
+</style>
+
+<script>
+function switchTab(tabName) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('tab', tabName);
+  window.history.pushState({}, '', url);
+
+  document.querySelectorAll('.tab-content').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  document.querySelectorAll('.tab-button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+
+  document.getElementById(tabName).classList.add('active');
+  if (tabName === 'descriptive') {
+    document.getElementById('descriptiveBtn').classList.add('active');
+  } else {
+    document.getElementById('hypothesisBtn').classList.add('active');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tab = urlParams.get('tab');
+  if (tab) {
+    switchTab(tab);
+  }
+});
+</script>
+
+{% endblock content %}
