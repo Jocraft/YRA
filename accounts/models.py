@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from django.db.models import Q
+from django.db.models import Q, Count
 from PIL import Image
 
 from course.models import Program
@@ -157,7 +157,12 @@ class User(AbstractUser):
     is_lecturer = models.BooleanField(default=False)
     is_parent = models.BooleanField(default=False)
     is_dep_head = models.BooleanField(default=False)
-
+    # New date_of_birth field
+    date_of_birth = models.DateField(
+        blank=True,
+        null=True,
+        help_text=_("Optional. Format: YYYY-MM-DD.")
+    )
     gender = models.CharField(max_length=1, choices=GENDERS, blank=True, null=True)
     phone = models.CharField(max_length=60, blank=True, null=True)
     address = models.CharField(max_length=60, blank=True, null=True)
@@ -264,18 +269,68 @@ class Student(models.Model):
         ordering = ("-student__date_joined",)
 
     def __str__(self):
-        return self.student.get_full_name()  # Call the method with parentheses
+        return self.student.get_full_name()
 
     def program_name(self):
         if self.program:
-            return self.program.title  # Assuming title is the correct field name in Program model
+            return self.program.title
         return None
-    
+
     @classmethod
     def get_gender_count(cls):
-        males_count = Student.objects.filter(student__gender="M").count()
-        females_count = Student.objects.filter(student__gender="F").count()
+        males_count = cls.objects.filter(student__gender="M").count()
+        females_count = cls.objects.filter(student__gender="F").count()
         return {"M": males_count, "F": females_count}
+
+    @classmethod
+    def get_college_count(cls):
+        """
+        Returns a QuerySet (or dict) of the number of students
+        in each faculty (college).
+        
+        Example return format if you turn it into a dict:
+        {
+            'Faculty of Engineering': 10,
+            'Faculty of Medicine': 7,
+            ...
+        }
+        """
+        data = (
+            cls.objects
+            .values("student__faculty")         # group by faculty
+            .annotate(count=Count("student__faculty"))  # count
+            .order_by("student__faculty")       # optional ordering
+        )
+
+        # If you want a dict {faculty_name: count}:
+        return {
+            item["student__faculty"]: item["count"] 
+            for item in data if item["student__faculty"]
+        }
+
+    @classmethod
+    def get_level_count(cls):
+        """
+        Returns a QuerySet (or dict) of the number of students
+        in each level.
+        
+        Example return format if you turn it into a dict:
+        {
+            'High School': 3,
+            'Bachelor Degree': 15,
+            'Master Degree': 4,
+            ...
+        }
+        """
+        data = (
+            cls.objects
+            .values("level")              
+            .annotate(count=Count("level"))  
+            .order_by("level")             # optional ordering
+        )
+
+        # If you want a dict {level: count}:
+        return {item["level"]: item["count"] for item in data if item["level"]}
 
     def get_absolute_url(self):
         return reverse("profile_single", kwargs={"user_id": self.id})
@@ -284,7 +339,6 @@ class Student(models.Model):
         # Deleting the student also deletes the associated User.
         self.student.delete()
         super().delete(*args, **kwargs)
-
 
 class Parent(models.Model):
     """

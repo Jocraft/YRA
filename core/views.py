@@ -25,14 +25,19 @@ def home_view(request):
 @admin_required
 def dashboard_view(request):
     logs = ActivityLog.objects.all().order_by("-created_at")[:10]
-    gender_count = Student.get_gender_count()
+    gender_counts = Student.get_gender_count()  # returns { "M": <number>, "F": <number> }
+    levels = Student.get_level_count()          # returns { "Bachelor Degree": X, "Master Degree": Y, ... }
+    colleges = Student.get_college_count()      # returns { "Faculty of Engineering": X, "Faculty of Medicine": Y, ... }
     context = {
-        "student_count": User.objects.get_student_count(),
-        "lecturer_count": User.objects.get_lecturer_count(),
-        "superuser_count": User.objects.get_superuser_count(),
-        "males_count": gender_count["M"],
-        "females_count": gender_count["F"],
+        # Existing context data:
+        'student_count': User.objects.get_student_count(),
+        'lecturer_count': User.objects.get_lecturer_count(),
+        'superuser_count': User.objects.get_superuser_count(),
         "logs": logs,
+        'males_count': gender_counts['M'],
+        'females_count': gender_counts['F'],
+        'student_levels': levels,
+        'student_colleges': colleges,
     }
     return render(request, "core/dashboard.html", context)
 

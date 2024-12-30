@@ -316,6 +316,13 @@ class StudentAddForm(UserCreationForm):
         label="Faculty",
     )
 
+    # --- NEW FIELD: Date of Birth ---
+    date_of_birth = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+        label="Date of Birth",
+    )
+
     class Meta(UserCreationForm.Meta):
         model = User
 
@@ -335,7 +342,10 @@ class StudentAddForm(UserCreationForm):
         # Save the new faculty field
         user.faculty = self.cleaned_data.get("faculty")
 
-        # Additional new fields
+        # Save date of birth
+        user.date_of_birth = self.cleaned_data.get("date_of_birth")
+
+        # Additional fields
         user.nationality = self.cleaned_data.get("nationality")
         user.national_id = self.cleaned_data.get("national_id")
         user.enrollment_date = self.cleaned_data.get("enrollment_date")
@@ -361,10 +371,9 @@ class StudentAddForm(UserCreationForm):
 class ProfileUpdateForm(UserChangeForm):
     """
     Used for editing an existing user (Student, Staff, etc.).
-    Now includes the extra fields (faculty, nationality, ethnicity, religion, languages_spoken).
+    Now includes the extra fields (faculty, nationality, ethnicity, religion, languages_spoken, and date_of_birth).
     """
 
-    # Basic fields
     email = forms.EmailField(
         widget=forms.TextInput(
             attrs={
@@ -419,7 +428,7 @@ class ProfileUpdateForm(UserChangeForm):
         label="Address / city",
     )
 
-    # --- NEW FIELDS: Single-choice ---
+    # single-choices
     nationality = forms.ChoiceField(
         required=False,
         choices=NATIONALITIES,
@@ -439,7 +448,6 @@ class ProfileUpdateForm(UserChangeForm):
         label="Religion",
     )
 
-    # --- NEW FIELDS: ID, enrollment, etc. ---
     national_id = forms.CharField(
         max_length=50,
         required=False,
@@ -457,7 +465,7 @@ class ProfileUpdateForm(UserChangeForm):
         label="Expected Graduation Date",
     )
 
-    # --- NEW FIELD: Multiple-choice for languages ---
+    # multiple-choice
     languages_spoken = forms.MultipleChoiceField(
         required=False,
         choices=LANGUAGES,
@@ -467,12 +475,19 @@ class ProfileUpdateForm(UserChangeForm):
         label="Languages Spoken",
     )
 
-    # --- NEW FIELD: Faculty ---
+    # new faculty
     faculty = forms.ChoiceField(
         choices=FACULTIES,
         required=False,
         widget=forms.Select(attrs={"class": "browser-default custom-select form-control"}),
         label="Faculty",
+    )
+
+    # --- NEW FIELD: Date of Birth ---
+    date_of_birth = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+        label="Date of Birth",
     )
 
     class Meta:
@@ -492,6 +507,7 @@ class ProfileUpdateForm(UserChangeForm):
             "enrollment_date",
             "expected_graduation_date",
             "faculty",
+            "date_of_birth",  # make sure it's here too
         ]
 
     def __init__(self, *args, **kwargs):
@@ -512,6 +528,9 @@ class ProfileUpdateForm(UserChangeForm):
 
         # Make sure faculty is saved
         user.faculty = self.cleaned_data.get("faculty")
+
+        # Save date_of_birth
+        user.date_of_birth = self.cleaned_data.get("date_of_birth")
 
         if commit:
             user.save()
