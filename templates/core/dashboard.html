@@ -67,31 +67,28 @@
             <h3><i class="fas fa-users bg-light-purple"></i></h3>
             <div class="text-right">
                 {% trans 'Programs' %}
-                <h2>500</h2> <!-- Or pass an actual program_count if you have it -->
+                <h2>{{ total_program_count }}</h2> 
             </div>
         </div>
     </div>
 </div>
 
+<!--
+    REMOVE the "traffic" and "enrollment" chart columns entirely.
+    We also rename the "students_grade" canvas to "students_age".
+-->
+
 <div class="row px-2">
+    <!-- Just keep one chart for Students Age (replacing "students_grade"). -->
     <div class="col-md-6 p-2">
+        
         <div class="chart-wrap">
             <i class="fas fa-expand-alt"></i>
-            <canvas id="traffic"></canvas>
+            <canvas id="students_age"></canvas>
         </div>
     </div>
-    <div class="col-md-6 p-2">
-        <div class="chart-wrap">
-            <i class="fas fa-expand-alt"></i>
-            <canvas id="enrollement"></canvas>
-        </div>
-    </div>
-    <div class="col-md-6 p-2">
-        <div class="chart-wrap">
-            <i class="fas fa-expand-alt"></i>
-            <canvas id="students_grade"></canvas>
-        </div>
-    </div>
+    
+    <!-- Keep the activities card on the right -->
     <div class="col-md-6 p-2">
         <div class="card w-100 h-100 p-3">
             <h5>{% trans 'Latest activities' %}</h5>
@@ -105,7 +102,9 @@
         </div>
     </div>
 </div>
+
 <br>
+
 <div class="bg-white p-3">
     <h5 class="border-bottom pb-2">{% trans 'Acadmy Demographics' %}</h5>
     <div class="row">
@@ -150,201 +149,69 @@
     // From your view, we assume these context variables are passed in:
     const malesCount = {{ males_count }};      // e.g. 20
     const femalesCount = {{ females_count }};  // e.g. 30
-    
-    // For the new pie charts
+
+    // For the demographic pies
     const studentLevelsData = {{ student_levels|safe }};   // { "Bachelor Degree": X, "Master Degree": Y, ... }
     const studentCollegesData = {{ student_colleges|safe }};  // { "Faculty of Eng.": A, "Faculty of Medicine": B, ... }
+
+    // For the new "Students Age" bar chart:
+    // e.g. { "18": 5, "19": 10, "20": 8, "21": 12 }
+    const studentAgesData = {{ student_ages|safe }};
 
 $(document).ready(function () {
 
     // ---------------------------------------------------------
-    // 1) Traffic Chart (Line)
+    // 1) Students Age (Bar)
     // ---------------------------------------------------------
-    const labels = [
-        gettext('January'),
-        gettext('February'),
-        gettext('March'),
-        gettext('April'),
-        gettext('May'),
-        gettext('June'),
-    ];
-    const data = {
-        labels: labels,
-        datasets: [
-            {
-                label: gettext('Students'),
-                backgroundColor: 'rgba(86, 224, 224, 0.5)',
-                borderColor: 'rgb(86, 224, 224)',
-                hoverBorderWidth: 3,
-                data: [0, 10, 5, 2, 20, 30, 45]
-            },
-            {
-                label: gettext('Teachers'),
-                backgroundColor: 'rgba(253, 174, 28, 0.5)',
-                borderColor: 'rgb(253, 174, 28)',
-                hoverBorderWidth: 3,
-                data: [20, 0, 15, 4, 6, 4, 60],
-            },
-            {
-                label: gettext('Admins'),
-                backgroundColor: 'rgba(203, 31, 255, 0.5)',
-                borderColor: 'rgb(203, 31, 255)',
-                hoverBorderWidth: 3,
-                data: [85, 30, 34, 20, 20, 55, 45],
-            },
-            {
-                label: gettext('Stuffs'),
-                backgroundColor: 'rgba(255, 19, 157, 0.5)',
-                borderColor: 'rgb(255, 19, 157)',
-                hoverBorderWidth: 3,
-                data: [45, 75, 70, 80, 20, 30, 90],
-            }
-        ]
+    const studentAgesLabels = Object.keys(studentAgesData);       // e.g. [ "18", "19", "20", "21" ]
+    const studentAgesValues = Object.values(studentAgesData);     // e.g. [ 5, 10, 8, 12 ]
+
+    const dataStudentAges = {
+      labels: studentAgesLabels,
+      datasets: [{
+        label: gettext("Number of Students by Age"),
+        backgroundColor: 'rgba(86, 224, 224, 0.5)',
+        borderColor: 'rgb(86, 224, 224)',
+        hoverBorderWidth: 3,
+        data: studentAgesValues
+      }]
     };
 
-    var traffic = document.getElementById('traffic');
-    new Chart(traffic, {
-        type: 'line',
-        data: data,
-        options: {
-            plugins: {
-                title: {
-                    display: true,
-                    text: gettext('Website Traffic'),
-                    padding: 15
-                }
+    var students_age = document.getElementById('students_age');
+    new Chart(students_age, {
+      type: 'bar',
+      data: dataStudentAges,
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: gettext('Students Age Distribution'),
+            padding: 20
+          },
+          legend: {
+            display: false  // optional if you don't want a legend
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: gettext('Number of Students')
             }
+          },
+          x: {
+            title: {
+              display: true,
+              text: gettext('Age')
+            }
+          }
         }
+      }
     });
 
     // ---------------------------------------------------------
-    // 2) Enrollment Chart (Bar)
-    // ---------------------------------------------------------
-    const labelsEnrollment = [
-        '2016',
-        '2017',
-        '2018',
-        '2019',
-        '2020',
-        '2021',
-    ];
-    const dataEnrollment = {
-        labels: labelsEnrollment,
-        datasets: [
-            {
-                label: gettext('Comp.S'),
-                backgroundColor: 'rgba(86, 224, 224, 0.5)',
-                borderColor: 'rgb(86, 224, 224)',
-                hoverBorderWidth: 3,
-                data: [0, 10, 5, 2, 20, 30, 45]
-            },
-            {
-                label: gettext('Architecture'),
-                backgroundColor: 'rgba(253, 174, 28, 0.5)',
-                borderColor: 'rgb(253, 174, 28)',
-                hoverBorderWidth: 3,
-                data: [20, 0, 15, 4, 6, 4, 60],
-            },
-            {
-                label: gettext('Civil Eng'),
-                backgroundColor: 'rgba(203, 31, 255, 0.5)',
-                borderColor: 'rgb(203, 31, 255)',
-                hoverBorderWidth: 3,
-                data: [85, 30, 34, 20, 20, 55, 45],
-            },
-            {
-                label: gettext('Accounting'),
-                backgroundColor: 'rgba(255, 19, 157, 0.5)',
-                borderColor: 'rgb(255, 19, 157)',
-                hoverBorderWidth: 3,
-                data: [45, 75, 70, 80, 20, 30, 90],
-            },
-            {
-                label: gettext('Business M.'),
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                borderColor: 'rgb(0, 0, 0)',
-                hoverBorderWidth: 3,
-                data: [15, 75, 45, 90, 60, 30, 90],
-            }
-        ]
-    };
-
-    var enrollement = document.getElementById('enrollement');
-    new Chart(enrollement, {
-        type: 'bar',
-        data: dataEnrollment,
-        options: {
-            plugins: {
-                title: {
-                    display: true,
-                    text: gettext('Enrollment per course'),
-                    padding: 20
-                }
-            }
-        }
-    });
-
-    // ---------------------------------------------------------
-    // 3) Students Average Grade (Bar)
-    // ---------------------------------------------------------
-    const labelsGrade = [
-        '2017',
-        '2018',
-        '2019',
-        '2020',
-        '2022',
-    ];
-    const dataGrade = {
-        labels: labelsGrade,
-        datasets: [
-            {
-                label: gettext("Comp sci."),
-                backgroundColor: 'rgba(86, 224, 224, 0.5)',
-                borderColor: 'rgb(86, 224, 224)',
-                hoverBorderWidth: 3,
-                data: [0, 10, 5, 2, 20, 30, 45]
-            },
-            {
-                label: gettext("Civil eng."),
-                backgroundColor: 'rgba(253, 174, 28, 0.5)',
-                borderColor: 'rgb(253, 174, 28)',
-                hoverBorderWidth: 3,
-                data: [20, 0, 15, 4, 6, 4, 60],
-            },
-            {
-                label: gettext("Architect."),
-                backgroundColor: 'rgba(203, 31, 255, 0.5)',
-                borderColor: 'rgb(203, 31, 255)',
-                hoverBorderWidth: 3,
-                data: [85, 30, 34, 20, 20, 55, 45],
-            },
-            {
-                label: gettext("Economics"),
-                backgroundColor: 'rgba(255, 19, 157, 0.5)',
-                borderColor: 'rgb(255, 19, 157)',
-                hoverBorderWidth: 3,
-                data: [45, 75, 70, 80, 20, 30, 90],
-            }
-        ]
-    };
-    
-    var students_grade = document.getElementById('students_grade');
-    new Chart(students_grade, {
-        type: 'bar',
-        data: dataGrade,
-        options: {
-            plugins: {
-                title: {
-                    display: true,
-                    text: gettext('Students average grade (performance)'),
-                    padding: 20
-                }
-            }
-        }
-    });
-
-    // ---------------------------------------------------------
-    // 4) Students Gender Pie
+    // 2) Students Gender Pie
     // ---------------------------------------------------------
     const dataGender = {
         labels: [
@@ -377,11 +244,9 @@ $(document).ready(function () {
         }
     });
 
-
     // ---------------------------------------------------------
-    // 5) Students Levels Pie
+    // 3) Students Levels Pie
     // ---------------------------------------------------------
-    // student_levels => { "Bachelor Degree": X, "Master Degree": Y, ... }
     const studentLevelsLabels = Object.keys(studentLevelsData);
     const studentLevelsValues = Object.values(studentLevelsData);
 
@@ -417,11 +282,9 @@ $(document).ready(function () {
       }
     });
 
-
     // ---------------------------------------------------------
-    // 6) Students Colleges Pie (with legend callback)
+    // 4) Students Colleges Pie (with legend callback)
     // ---------------------------------------------------------
-    // student_colleges => { "Faculty of Engineering": X, "Faculty of Medicine": Y, ... }
     const studentCollegesLabels = Object.keys(studentCollegesData);
     const studentCollegesValues = Object.values(studentCollegesData);
 
@@ -437,7 +300,6 @@ $(document).ready(function () {
           'rgb(75, 192, 192)',
           'rgb(153, 102, 255)',
           'rgb(255, 159, 64)',
-          // add more colors if needed
         ],
         hoverOffset: 4
       }]
@@ -452,14 +314,10 @@ $(document).ready(function () {
           legend: {
             labels: {
               generateLabels: function (chart) {
-                // 1) Get default labels from Chart.js
                 let defaultLabels = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-
-                // 2) Sort them by slice value (descending)
+                // Sort them desc by slice value
                 defaultLabels.sort((a, b) => b.value - a.value);
-
-                // 3) Return only the top 3 legend items
-                //    (Adjust as needed—top 5, top 10, etc.)
+                // Keep top 3 only
                 return defaultLabels.slice(0, 3);
               }
             }

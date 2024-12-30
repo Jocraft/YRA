@@ -1,3 +1,4 @@
+from datetime import date
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import AbstractUser, UserManager
@@ -220,7 +221,17 @@ class User(AbstractUser):
             return _("Lecturer")
         elif self.is_parent:
             return _("Parent")
-
+    @property
+    def age(self):
+        """Returns the user's age in years, or None if DOB is not set."""
+        if not self.date_of_birth:
+            return None
+        today = date.today()
+        return (
+            today.year
+            - self.date_of_birth.year
+            - ((today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day))
+        )   
     def get_picture(self):
         try:
             return self.picture.url
@@ -331,7 +342,21 @@ class Student(models.Model):
 
         # If you want a dict {level: count}:
         return {item["level"]: item["count"] for item in data if item["level"]}
-
+    @classmethod
+    def get_age_distribution(cls):
+        """
+        Returns a dictionary {age: count} 
+        for all students who have a valid date_of_birth.
+        Example: {18: 4, 19: 12, 20: 10, ...}
+        """
+        age_dict = {}
+        all_students = cls.objects.select_related("student")
+        for st in all_students:
+            user_age = st.student.age  # uses @property age above
+            if user_age is not None:
+                age_dict[user_age] = age_dict.get(user_age, 0) + 1
+        return age_dict
+    
     def get_absolute_url(self):
         return reverse("profile_single", kwargs={"user_id": self.id})
 

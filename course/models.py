@@ -31,6 +31,12 @@ class Program(models.Model):
 
     def get_absolute_url(self):
         return reverse("program_detail", kwargs={"pk": self.pk})
+    @classmethod
+    def total_program_count(cls):
+        """
+        Returns the total number of Program records in the database.
+        """
+        return cls.objects.count()
 
 
 @receiver(post_save, sender=Program)

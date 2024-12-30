@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 
 from accounts.decorators import admin_required, lecturer_required
 from accounts.models import User, Student
+from course.models import Program
 from .forms import SessionForm, SemesterForm, NewsAndEventsForm
 from .models import NewsAndEvents, ActivityLog, Session, Semester
 
@@ -28,6 +29,8 @@ def dashboard_view(request):
     gender_counts = Student.get_gender_count()  # returns { "M": <number>, "F": <number> }
     levels = Student.get_level_count()          # returns { "Bachelor Degree": X, "Master Degree": Y, ... }
     colleges = Student.get_college_count()      # returns { "Faculty of Engineering": X, "Faculty of Medicine": Y, ... }
+    student_ages = Student.get_age_distribution()  # => {18: 5, 19: 10, ...}
+    total_program_count = Program.total_program_count()
     context = {
         # Existing context data:
         'student_count': User.objects.get_student_count(),
@@ -38,6 +41,9 @@ def dashboard_view(request):
         'females_count': gender_counts['F'],
         'student_levels': levels,
         'student_colleges': colleges,
+        'student_ages': student_ages,
+        'total_program_count': total_program_count,
+
     }
     return render(request, "core/dashboard.html", context)
 
