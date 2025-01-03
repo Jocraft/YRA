@@ -164,6 +164,9 @@ class User(AbstractUser):
         null=True,
         help_text=_("Optional. Format: YYYY-MM-DD.")
     )
+
+
+
     gender = models.CharField(max_length=1, choices=GENDERS, blank=True, null=True)
     phone = models.CharField(max_length=60, blank=True, null=True)
     address = models.CharField(max_length=60, blank=True, null=True)
@@ -197,6 +200,8 @@ class User(AbstractUser):
     username_validator = ASCIIUsernameValidator()
 
     objects = CustomUserManager()
+
+
 
     class Meta:
         ordering = ("-date_joined",)

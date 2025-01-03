@@ -81,7 +81,30 @@
         <p><strong>Question: </strong>{{ hypothesis_results.question }}</p>
         <p><strong>p-value: </strong>{{ hypothesis_results.p_value }}</p>
         <p><strong>Result: </strong>{{ hypothesis_results.result }}</p>
-        
+
+
+        {% if hypothesis_results.program_percentages %}
+          <h3 class="black-text"> Program Distribution by {{ form.column.label }}</h3>
+          <ul class="black-text">
+            {% for program, percentages in hypothesis_results.program_percentages.items %}
+              <li class="black-text"><strong class="black-text">{{ program }}:</strong>
+                <ul class="black-text">
+                  {% for category, percentage in percentages.items %}
+                    <li class="black-text">{{ category }}: {{ percentage }}%</li>
+                  {% endfor %}
+                </ul>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        {% if hypothesis_results.plot_html %}
+        <div class="analysis-section analysis-plot-section">
+          <h3>Bar Plot</h3>
+          <div class="analysis-plot-container">
+            {{ hypothesis_results.plot_html|safe }}
+          </div>
+        </div>
+      {% endif %}
       </div>
     {% endif %}
   </div>
@@ -93,6 +116,9 @@
   margin-bottom: 2rem;
   display: flex;
   gap: 1rem;
+}
+.black-text {
+  color: black;
 }
 
 .tab-button {

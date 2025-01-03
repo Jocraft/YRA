@@ -16,8 +16,8 @@ class AnalysisForm(forms.Form):
         fields_to_remove = [
             'password', 'last_login', 'is_superuser', 'user_permissions', 'groups', 
             'is_student', 'is_lecturer', 'is_parent', 'is_dep_head', 'date_joined', 
-            'username', 'first_name', 'last_name', 'email', 'is_active', 'is_staff', 'is_admin', "picture","address",
-            "national_id","phone","student","id"
+            'username', 'first_name', 'last_name', 'email', 'is_active', 'is_staff', 'is_admin', "picture", "address",
+            "national_id", "phone", "student", "id", "program" ,"date_of_birth" , "expected_graduation_date", "enrollment_date"# Exclude "program" here for a custom implementation
         ]  
 
         available_fields = [field for field in all_fields if field not in fields_to_remove]
@@ -35,3 +35,19 @@ class AnalysisForm(forms.Form):
             required=False,
             label="Group By (Optional)"
         )
+
+        # Special handling for program names
+        self.fields['column'].choices += [('program_name', 'Program')]
+        self.fields['group_by'].choices += [('program_name', 'Program')]
+
+
+        self.fields['column'].choices += [('date_of_birth', 'Age')]
+        self.fields['group_by'].choices += [('date_of_birth', 'Age')]
+
+        self.fields['column'].choices += [('enrollment_date', 'When did enroll (in months)')]
+        self.fields['group_by'].choices += [('enrollment_date', 'When did enroll (in months)')]
+
+
+        self.fields['column'].choices += [('expected_graduation_date', 'when to grad (in months)')]
+        self.fields['group_by'].choices += [('expected_graduation_date', 'when to grad (in months)')]
+
