@@ -90,6 +90,7 @@
                     <p><strong>{% trans 'First Name' %}:</strong> {{ user.first_name|title }}</p>
                     <p><strong>{% trans 'Last Name' %}:</strong> {{ user.last_name|title }}</p>
                     <p><strong>{% trans 'ID No.' %}:</strong> {{ user.username }}</p>
+
                 </div>
                 {% if user.is_student %}
                 <hr>
@@ -118,6 +119,25 @@
                     {% endif %}
                     <p><strong>{% trans 'Registered Date' %}:</strong> {{ user.date_joined|date }}</p>
                 </div>
+                <hr> {# Separator between sections #}
+
+                    <p class="fw-bold"><i class="me-2 fas fa-info-circle"></i> {% trans 'Additional Info' %}</p> {# Changed icon and title #}
+                    <div class="dashboard-description">
+                    <p><strong>{% trans 'Nationality' %}:</strong> {{ user.nationality }}</p>
+                    <p><strong>{% trans 'National ID' %}:</strong> {{ user.national_id }}</p>
+                    <p><strong>{% trans 'Enrollment Date.' %}:</strong> {{ user.enrollment_date }}</p>
+                    <p><strong>{% trans 'Expected Graduation Date' %}:</strong> {{ user.expected_graduation_date|date:"SHORT_DATE_FORMAT" }}</p> {# Added date formatting #}
+                    </div>
+
+                    <hr> {# Separator between sections #}
+
+                    <p class="fw-bold"><i class="me-2 fas fa-book"></i> {% trans 'Background' %}</p> {# Changed icon and title #}
+                    <div class="dashboard-description">
+                    <p><strong>{% trans 'Ethnicity' %}:</strong> {{ user.ethnicity }}</p>
+                    <p><strong>{% trans 'Religion' %}:</strong> {{ user.religion }}</p>
+                    <p><strong>{% trans 'Languages Spoken' %}:</strong> {{ user.languages_spoken }}</p>
+                    </div>
+
             </div>
         </div>
     </div>

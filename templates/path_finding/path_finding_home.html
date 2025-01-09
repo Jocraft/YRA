@@ -51,6 +51,7 @@
       <h4 class="mb-0">
         {% trans "Selected Student" %}: 
         <span class="text-warning">{{ selected_student }}</span>
+        , ID: <span class="text-warning">{{ student_id }}</span>, Enrollment Date: <span class="text-warning">{% if enrollment_date %}{{ enrollment_date }}{% else %}Not Available{% endif %}</span>
       </h4>
     </div>
     <div class="col-auto d-flex align-items-center">
