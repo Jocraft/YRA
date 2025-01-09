@@ -61,6 +61,7 @@ PROJECT_APPS = [
     "course.apps.CourseConfig",
     "search.apps.SearchConfig",    
     'analysis.apps.AnalysisConfig',
+    'path_finding.apps.PathFindingConfig',
 
 ]
 

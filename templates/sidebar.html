@@ -25,6 +25,7 @@
 		{% url 'course_registration' as cr %} {% url 'edit_profile' as ep %} {% url 'change_password' as cp %}
 		{% url 'admin_panel' as admin_p %}
 		{% url 'analysis' as analysis %}
+		{% url 'path_finding_home' as path_finding_home %}
 
 
 
@@ -59,6 +60,12 @@
 			{% if request.user.is_superuser  %}
 			<li class="{% if request.path == analysis %}active{% endif %}">
 				<a href="{% url 'analysis' %}"><i class="fas fa-chart-line"></i>{% trans 'Analysis' %}</a>
+			</li>
+
+			{% endif %}
+			{% if request.user.is_superuser  %}
+			<li class="{% if request.path == path_finding_home %}active{% endif %}">
+				<a href="{% url 'path_finding_home' %}"><i class="fas fa-map-signs"></i>{% trans 'Path Finding' %}</a>
 			</li>
 
 			{% endif %}

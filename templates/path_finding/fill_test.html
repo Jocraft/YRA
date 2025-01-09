@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}Take the Test{% endblock %}
+
+{% block content %}
+<!-- BREADCRUMB -->
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">{% trans 'Home' %}</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'path_finding_home' %}">{% trans 'Path Finding' %}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{% trans 'test' %}</li>
+    </ol>
+  </nav>
+<div class="container-fluid" style="background-color: #2c4065; min-height: 100vh;">
+  <div class="row justify-content-center align-items-center" style="padding: 80px 0;">
+    <!-- 
+      Make the card column more flexible by using multiple breakpoints:
+      - col-12 (full width on very small devices)
+      - col-md-10 (a bit narrower on medium)
+      - col-lg-8 (even narrower on large)
+      - col-xl-6 (and narrower still on extra-large screens).
+      Adjust these as you wish to get the perfect width. 
+    -->
+    <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+      <div 
+        class="card shadow-lg border-0 text-light"
+        style="background-color: #2b3458;"
+      >
+        <div class="card-body p-5">
+          <h2 class="card-title text-info mb-4">
+            <i class="bi bi-question-circle-fill me-2"></i> 
+            {% trans "Take The Test" %}
+          </h2>
+
+          <form method="POST" action="">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label for="q1" class="form-label fw-bold text-warning">
+                {% trans "Question 1" %}:
+              </label>
+              <input
+                type="text"
+                name="q1"
+                id="q1"
+                class="form-control bg-secondary text-light"
+                placeholder="{% trans 'Type your answer...' %}"
+              >
+            </div>
+
+            <div class="mb-3">
+              <label for="q2" class="form-label fw-bold text-warning">
+                {% trans "Question 2" %}:
+              </label>
+              <input
+                type="text"
+                name="q2"
+                id="q2"
+                class="form-control bg-secondary text-light"
+                placeholder="{% trans 'Type your answer...' %}"
+              >
+            </div>
+
+            <!-- More questions if needed -->
+
+            <button type="submit" class="btn btn-primary w-100 mt-4">
+              <i class="bi bi-send-fill"></i> 
+              {% trans "Submit" %}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

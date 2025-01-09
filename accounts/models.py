@@ -285,7 +285,7 @@ class Student(models.Model):
         ordering = ("-student__date_joined",)
 
     def __str__(self):
-        return self.student.get_full_name()
+        return self.student.get_full_name
 
     def program_name(self):
         if self.program:

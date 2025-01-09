@@ -1,0 +1,26 @@
+    <!-- templates/path_finding/results.html -->
+    {% extends 'base.html' %}
+    {% load static i18n %}
+
+    {% block title %}Test Results{% endblock %}
+
+    {% block content %}
+    <div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card bg-secondary">
+        <div class="card-body">
+            <h2 class="card-title mb-4">
+            {% trans "Results for Session" %} {{ session.id }}
+            </h2>
+            <p class="lead">
+            {{ result }}
+            </p>
+            <hr>
+            <a href="{% url 'path_finding_home' %}" class="btn btn-primary">
+            <i class="bi bi-arrow-left"></i> {% trans "Back to Home" %}
+            </a>
+        </div>
+        </div>
+    </div>
+    </div>
+    {% endblock %}
