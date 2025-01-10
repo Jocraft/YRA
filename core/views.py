@@ -7,6 +7,7 @@ from accounts.models import User, Student
 from course.models import Program
 from .forms import SessionForm, SemesterForm, NewsAndEventsForm
 from .models import NewsAndEvents, ActivityLog, Session, Semester
+from path_finding.models import TestSession
 
 
 # ########################################################
@@ -43,7 +44,7 @@ def dashboard_view(request):
         'student_colleges': colleges,
         'student_ages': student_ages,
         'total_program_count': total_program_count,
-
+        'tested_students_count': TestSession.get_tested_students_count(),
     }
     return render(request, "core/dashboard.html", context)
 
