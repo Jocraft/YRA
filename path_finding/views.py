@@ -54,14 +54,26 @@ def fill_test_view(request, session_id):
     session = get_object_or_404(TestSession, pk=session_id)
 
     if request.method == 'POST':
+        # Map question numbers to model fields
+        field_mapping = {
+            1: 'q1_numbers',
+            2: 'q2_math',
+            3: 'q3_problem_solving',
+            4: 'q4_future_job',
+            5: 'q5_tools',
+            6: 'q6_tech_interest',
+            7: 'q7_learning',
+            8: 'q8_computer_skills',
+            9: 'q9_projects',
+            10: 'q10_goals'
+        }
+        
+        # Store answers in the session model
         for question in QUESTIONS:
             answer_text = request.POST.get(f'q{question["order"]}')
             if answer_text:
-                TestAnswer.objects.create(
-                    test_session=session,
-                    question_id=question['order'],
-                    answer_text=answer_text
-                )
+                field_name = field_mapping[question['order']]
+                setattr(session, field_name, answer_text)
         
         session.is_complete = True
         session.save()
@@ -78,25 +90,37 @@ def generate_results_view(request, session_id):
     Analyzes the student's test answers using LLM and recommends programs
     """
     session = get_object_or_404(TestSession, pk=session_id)
-    answers = session.test_answers.all()
     programs = Program.objects.all()
     
-    # Create a list of question-answer pairs with full question text
-    qa_pairs = []
-    for answer in answers:
-        question_text = next(
-            (q['text'] for q in QUESTIONS if q['order'] == answer.question_id),
-            f"Question {answer.question_id}"
-        )
-        qa_pairs.append({
-            'question': question_text,
-            'answer': answer.answer_text,
-            'question_id': answer.question_id
-        })
+    # Map field names to question numbers
+    field_mapping = {
+        1: 'q1_numbers',
+        2: 'q2_math',
+        3: 'q3_problem_solving',
+        4: 'q4_future_job',
+        5: 'q5_tools',
+        6: 'q6_tech_interest',
+        7: 'q7_learning',
+        8: 'q8_computer_skills',
+        9: 'q9_projects',
+        10: 'q10_goals'
+    }
     
-    # Analyze all answers together
+    # Format all answers for LLM analysis
+    qa_pairs = []
+    for i in range(1, 11):
+        question = next((q for q in QUESTIONS if q['order'] == i), None)
+        if question:
+            field_name = field_mapping[i]
+            answer = getattr(session, field_name)
+            qa_pairs.append({
+                'question': question['text'],
+                'answer': answer,
+                'question_id': i
+            })
+    
+    # Analyze answers
     if qa_pairs:
-        # Format answers to include both questions and answers
         answer_summary = "\n\n".join([
             f"Question {qa['question_id']}: {qa['question']}\n"
             f"Student's Answer: {qa['answer']}"
@@ -108,11 +132,15 @@ def generate_results_view(request, session_id):
             answer=answer_summary,
             programs=programs
         )
+        
+        # Store the LLM analysis result
+        session.llm_analysis = result
+        session.save()
     else:
         result = "No answers found to analyze."
     
     return render(request, 'path_finding/results.html', {
         'session': session,
         'qa_pairs': qa_pairs,
-        'result': result,
+        'result': result
     })

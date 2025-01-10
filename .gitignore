@@ -1,2 +1,5 @@
 .venv
 venv/
+path_finding/secrets.py
+*.pyc
+__pycache__/
