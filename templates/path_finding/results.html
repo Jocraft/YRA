@@ -1,26 +1,37 @@
     <!-- templates/path_finding/results.html -->
     {% extends 'base.html' %}
-    {% load static i18n %}
+    {% load i18n %}
 
     {% block title %}Test Results{% endblock %}
 
     {% block content %}
-    <div class="row">
-    <div class="col-md-8 offset-md-2">
-        <div class="card bg-secondary">
-        <div class="card-body">
-            <h2 class="card-title mb-4">
-            {% trans "Results for Session" %} {{ session.id }}
-            </h2>
-            <p class="lead">
-            {{ result }}
-            </p>
-            <hr>
-            <a href="{% url 'path_finding_home' %}" class="btn btn-primary">
-            <i class="bi bi-arrow-left"></i> {% trans "Back to Home" %}
-            </a>
+    <div class="container mt-5">
+        <h2 class="mb-4">{% trans "Your Career Assessment Results" %}</h2>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="h5 mb-0">{% trans "Your Answers" %}</h3>
+            </div>
+            <div class="card-body">
+                {% for qa in qa_pairs %}
+                <div class="mb-3">
+                    <strong>{% trans "Question" %} {{ qa.question_id }}:</strong>
+                    <p class="text-muted mb-1">{{ qa.question }}</p>
+                    <p class="ms-3">{% trans "Your answer" %}: {{ qa.answer }}</p>
+                </div>
+                {% endfor %}
+            </div>
         </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="h5 mb-0">{% trans "Career Analysis & Recommendations" %}</h3>
+            </div>
+            <div class="card-body">
+                <div class="analysis-result">
+                    {{ result|linebreaks }}
+                </div>
+            </div>
         </div>
-    </div>
     </div>
     {% endblock %}

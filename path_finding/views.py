@@ -2,7 +2,10 @@
 
 from django.shortcuts import render, get_object_or_404, redirect
 from accounts.models import Student
-from .models import TestSession, TestAnswer
+from .models import TestSession, TestAnswer, Program
+from .questions import QUESTIONS
+from .llm_analyzer import analyze_answer
+from course.models import Program
 
 def path_finding_home(request):
     """
@@ -47,43 +50,69 @@ def create_test_session(request, student_id):
 def fill_test_view(request, session_id):
     """
     Page where the student answers the test.
-    If POST, we save answers and mark the session as complete (if desired).
     """
     session = get_object_or_404(TestSession, pk=session_id)
 
     if request.method == 'POST':
-        # Example of saving answers:
-        # Q1, Q2, etc. from form input
-        q1 = request.POST.get('q1')
-        q2 = request.POST.get('q2')
+        for question in QUESTIONS:
+            answer_text = request.POST.get(f'q{question["order"]}')
+            if answer_text:
+                TestAnswer.objects.create(
+                    test_session=session,
+                    question_id=question['order'],
+                    answer_text=answer_text
+                )
         
-        # If using a separate TestAnswer model:
-        if q1:
-            TestAnswer.objects.create(test_session=session, question_id=1, answer_text=q1)
-        if q2:
-            TestAnswer.objects.create(test_session=session, question_id=2, answer_text=q2)
-        
-        # Mark session as complete if you want:
         session.is_complete = True
         session.save()
-        
-        return redirect('path_finding_home')
+        return redirect('generate_results', session_id=session.id)
     
-    return render(request, 'path_finding/fill_test.html', {'session': session})
+    return render(request, 'path_finding/fill_test.html', {
+        'session': session,
+        'questions': QUESTIONS
+    })
 
 
 def generate_results_view(request, session_id):
     """
-    Placeholder for where you'd feed the student's saved answers
-    into an ML model to compute the recommended career path.
+    Analyzes the student's test answers using LLM and recommends programs
     """
     session = get_object_or_404(TestSession, pk=session_id)
-    # In real code, you'd retrieve the session's answers and call your ML logic
-    # answers = session.test_answers.all()
-    # result = my_ml_function(answers)
-    result = "Your career recommendation goes here (dummy for now)."
-
+    answers = session.test_answers.all()
+    programs = Program.objects.all()
+    
+    # Create a list of question-answer pairs with full question text
+    qa_pairs = []
+    for answer in answers:
+        question_text = next(
+            (q['text'] for q in QUESTIONS if q['order'] == answer.question_id),
+            f"Question {answer.question_id}"
+        )
+        qa_pairs.append({
+            'question': question_text,
+            'answer': answer.answer_text,
+            'question_id': answer.question_id
+        })
+    
+    # Analyze all answers together
+    if qa_pairs:
+        # Format answers to include both questions and answers
+        answer_summary = "\n\n".join([
+            f"Question {qa['question_id']}: {qa['question']}\n"
+            f"Student's Answer: {qa['answer']}"
+            for qa in qa_pairs
+        ])
+        
+        result = analyze_answer(
+            question="Based on all the student's answers to the career assessment questions, recommend suitable programs.",
+            answer=answer_summary,
+            programs=programs
+        )
+    else:
+        result = "No answers found to analyze."
+    
     return render(request, 'path_finding/results.html', {
         'session': session,
-        'result': result
+        'qa_pairs': qa_pairs,
+        'result': result,
     })

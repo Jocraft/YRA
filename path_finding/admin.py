@@ -1,7 +1,12 @@
 # path_finding/admin.py
 
 from django.contrib import admin
-from .models import TestSession, TestAnswer
+from .models import TestSession, TestAnswer, Program
+
+@admin.register(Program)
+class ProgramAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name', 'description')
 
 @admin.register(TestSession)
 class TestSessionAdmin(admin.ModelAdmin):
