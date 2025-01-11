@@ -26,6 +26,7 @@
 		{% url 'admin_panel' as admin_p %}
 		{% url 'analysis' as analysis %}
 		{% url 'path_finding_home' as path_finding_home %}
+		{% url 'learning_methods:learning' as learning_methods %}
 
 
 
@@ -67,10 +68,12 @@
 			<li class="{% if request.path == path_finding_home %}active{% endif %}">
 				<a href="{% url 'path_finding_home' %}"><i class="fas fa-map-signs"></i>{% trans 'Path Finding' %}</a>
 			</li>
-
 			{% endif %}
-
-
+			{% if request.user.is_superuser  %}
+			<li class="{% if request.path == learning_methods %}active{% endif %}">
+				<a href="{% url 'learning_methods:learning' %}"><i class="fas fa-brain""></i>{% trans 'Learning Methods' %}</a>
+			</li>
+			{% endif %}
 
 
 			<br />

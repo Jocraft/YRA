@@ -72,13 +72,13 @@ def analyze(request):
                     if len(programs) >= 2:
                         groups = [df[df['program'] == prog]['column'].values for prog in programs]
                         if len(groups) >= 2:
-                            f_stat, p_value = stats.f_oneway(*groups)
-                            means = df.groupby('program')['column'].mean()
+                            f_stat, p_value = stats.kruskal(*groups)
+                            means = df.groupby('program')['column'].median()
                             hypothesis_results = {
-                                'test': 'ANOVA',
+                                'test': 'Kruskal-Wallis',
                                 'question': f"Does {column} differ significantly across programs?",
                                 'p_value': f"{p_value:.4f}",
-                                'result': f"{'Significant' if p_value < 0.05 else 'No significant'} differences (Means: {means.to_dict()})"
+                                'result': f"{'Significant' if p_value < 0.05 else 'No significant'} differences (Averages (Medians): {means.to_dict()})"
                             }
                 else:
                     # Chi-square

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans "Learning Methods" %} | {% trans "Youth Road Analyzer" %}{% endblock title %}
+
+{% block content %}
+<!-- BREADCRUMB -->
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">{% trans 'Home' %}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{% trans 'Learning Methods' %}</li>
+    </ol>
+</nav>
+
+<h1 class="title-1 mb-4">{% trans "Learning Methods" %}</h1>
+
+<div class="row g-3 align-items-center mb-3">
+    <!-- Left column: label + dropdown -->
+    <div class="col-auto">
+        <label for="student" class="col-form-label fw-bold">
+            {% trans "Select Student" %}:
+        </label>
+    </div>
+    <div class="col-auto">
+        <!-- The GET form for the dropdown -->
+        <form method="get" action="" class="mb-0">
+            <select name="student" id="student" class="form-select" onchange="this.form.submit()">
+                <option value="">{% trans "--" %}</option>
+                {% for st in students %}
+                    <option value="{{ st.id }}" {% if selected_student and selected_student.id == st.id %}selected{% endif %}>
+                        {{ st }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+</div>
+
+{% if selected_student %}
+    <!-- Selected Student info + buttons -->
+    <div class="row g-3 align-items-center">
+        <div class="col-auto">
+            <h4 class="mb-0">
+                {% trans "Selected Student" %}: 
+                <span class="text-warning">{{ selected_student }}</span>
+                <!-- Add debug info -->
+                {% if debug %}
+                    <small>(Latest test: {{ latest_test }})</small>
+                {% endif %}
+            </h4>
+        </div>
+        <div class="col-auto d-flex align-items-center">
+            {% if latest_test %}
+                <!-- Debug: Test exists -->
+                <span class="text-info me-3 d-flex align-items-center">
+                    <i class="fas fa-check-circle me-1"></i>
+                    {% trans "Last test taken on" %}: {{ latest_test.date_taken|date:"F d, Y H:i" }}
+                </span>
+                <a href="{% url 'learning_methods:fill_test' selected_student.id %}" class="btn btn-primary me-2">
+                    <i class="fas fa-redo-alt"></i> {% trans "Retake Test" %}
+                </a>
+                <a href="{% url 'learning_methods:results' selected_student.id %}" class="btn btn-success">
+                    <i class="fas fa-chart-bar"></i> {% trans "View Results" %}
+                </a>
+            {% else %}
+                <!-- Debug: No test exists -->
+                <span class="text-warning me-3 d-flex align-items-center">
+                    <i class="fas fa-exclamation-circle me-1"></i>
+                    {% trans "This student has not taken the learning style test yet." %}
+                </span>
+                <a href="{% url 'learning_methods:fill_test' selected_student.id %}" class="btn btn-primary">
+                    <i class="fas fa-play-circle"></i> {% trans "Take Test" %}
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+
+{% endblock content %}
