@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans "Learning Style Test" %}{% endblock %}
+
+{% block content %}
+<!-- BREADCRUMB -->
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">{% trans 'Home' %}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'learning_methods:learning' %}">{% trans 'Learning Methods' %}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{% trans 'Test' %}</li>
+    </ol>
+</nav>
+
+<div class="container-fluid" style="background-color: #2c4065; min-height: 100vh;">
+    <div class="row justify-content-center align-items-center" style="padding: 80px 0;">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow-lg border-0 text-light" style="background-color: #2b3458;">
+                <div class="card-body p-5">
+                    <h2 class="card-title text-info mb-4">
+                        <i class="bi bi-question-circle-fill me-2"></i> 
+                        {% trans "Learning Style Assessment" %}
+                    </h2>
+
+                    <p class="text-light mb-4">
+                        {% trans "Please select all answers that apply to you for each question." %}
+                    </p>
+
+                    <form method="POST" action="" id="testForm">
+                        {% csrf_token %}
+
+                        {% for question in questions %}
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-warning">
+                                {% trans "Question" %} {{ forloop.counter }}: {{ question.text }}
+                            </label>
+                            <div class="ms-3">
+                                {% for option in question.options %}
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" 
+                                           type="checkbox" 
+                                           name="q{{ forloop.parentloop.counter }}" 
+                                           value="{{ option.value }}"
+                                           id="q{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
+                                    <label class="form-check-label text-light" 
+                                           for="q{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
+                                        {{ option.text }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-primary w-100 mt-4">
+                            <i class="bi bi-send-fill"></i> 
+                            {% trans "Submit" %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('testForm').addEventListener('submit', function(e) {
+    // Check if at least one option is selected for each question
+    let questions = {{ questions|length }};
+    for (let i = 1; i <= questions; i++) {
+        let checkboxes = document.querySelectorAll(`input[name="q${i}"]:checked`);
+        if (checkboxes.length === 0) {
+            e.preventDefault();
+            alert(`Please select at least one option for question ${i}`);
+            return;
+        }
+    }
+});
+</script>
+{% endblock %}

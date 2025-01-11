@@ -62,6 +62,7 @@ PROJECT_APPS = [
     "search.apps.SearchConfig",    
     'analysis.apps.AnalysisConfig',
     'path_finding.apps.PathFindingConfig',
+    'learning_methods.apps.LearningMethodsConfig',
 
 ]
 

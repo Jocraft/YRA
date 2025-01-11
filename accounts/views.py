@@ -296,6 +296,8 @@ def edit_student(request, pk):
     - languages_spoken (multiple-choice)
     """
     student_user = get_object_or_404(User, is_student=True, pk=pk)
+    student = get_object_or_404(Student, student=student_user)
+    
     if request.method == "POST":
         form = ProfileUpdateForm(request.POST, request.FILES, instance=student_user)
         if form.is_valid():
@@ -306,8 +308,17 @@ def edit_student(request, pk):
         messages.error(request, "Please correct the error below.")
     else:
         form = ProfileUpdateForm(instance=student_user)
+    
     return render(
-        request, "accounts/edit_student.html", {"title": "Edit Student", "form": form}
+        request, 
+        "accounts/edit_student.html", 
+        {
+            "title": "Edit Student", 
+            "form": form,
+            "student_program": student.program.title if student.program else "Not assigned",
+            "student_level": student.level if student.level else "Not assigned",
+            "student_faculty": student_user.faculty if student_user.faculty else "Not assigned"
+        }
     )
 
 

@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans "Learning Style Results" %}{% endblock %}
+
+{% block content %}
+<!-- BREADCRUMB -->
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">{% trans 'Home' %}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'learning_methods:learning' %}">{% trans 'Learning Methods' %}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{% trans 'Results' %}</li>
+    </ol>
+</nav>
+
+<div class="container-fluid" style="background-color: #2c4065; min-height: 100vh;">
+    <div class="row justify-content-center" style="padding: 40px 0;">
+        <div class="col-12 col-md-10">
+            <div class="card shadow-lg border-0 text-light" style="background-color: #2b3458;">
+                <div class="card-body p-5">
+                    <h2 class="card-title text-info mb-4">
+                        <i class="bi bi-graph-up"></i> 
+                        {% trans "Learning Style Results" %}
+                    </h2>
+
+                    <!-- Percentages Display -->
+                    <div class="row mb-5">
+                        <div class="col-md-3">
+                            <div class="text-center mb-4 {% if 'V' in dominant_styles %}border border-warning rounded p-3{% endif %}">
+                                <h4 class="text-warning">Visual (V)</h4>
+                                <h2 class="display-4">{{ percentages.V|floatformat:1 }}%</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center mb-4 {% if 'A' in dominant_styles %}border border-warning rounded p-3{% endif %}">
+                                <h4 class="text-warning">Aural (A)</h4>
+                                <h2 class="display-4">{{ percentages.A|floatformat:1 }}%</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center mb-4 {% if 'R' in dominant_styles %}border border-warning rounded p-3{% endif %}">
+                                <h4 class="text-warning">Read/Write (R)</h4>
+                                <h2 class="display-4">{{ percentages.R|floatformat:1 }}%</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center mb-4 {% if 'K' in dominant_styles %}border border-warning rounded p-3{% endif %}">
+                                <h4 class="text-warning">Kinesthetic (K)</h4>
+                                <h2 class="display-4">{{ percentages.K|floatformat:1 }}%</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dominant Style Details -->
+                    <div class="mt-4">
+                        <h3 class="text-warning mb-4">{% trans "Your Dominant Learning Style(s)" %}</h3>
+                        {% for style in dominant_styles %}
+                            <div class="mb-5">
+                                {% if style == 'V' %}
+                                    <h4 class="text-info">Visual (V)</h4>
+                                    <h5 class="text-warning mt-4">Features:</h5>
+                                    <ul class="text-light">
+                                        <li class="mb-2">Prefers diagrams, charts, maps, graphs, and flowcharts.</li>
+                                        <li class="mb-2">Uses colors and symbols for organization.</li>
+                                        <li class="mb-2">Likes spatial and geometric representations of information.</li>
+                                        <li class="mb-2">Benefits from mind maps, infographics, and videos with visual elements.</li>
+                                        <li class="mb-2">Learns better through observing patterns and relationships.</li>
+                                        <li class="mb-2">Struggles with dense blocks of text without visuals.</li>
+                                    </ul>
+                                    <h5 class="text-warning mt-4">Effective Learning Tools:</h5>
+                                    <ul class="text-light">
+                                        <li class="mb-2">PowerPoint presentations with diagrams and images.</li>
+                                        <li class="mb-2">Concept mapping and visual flowcharts.</li>
+                                        <li class="mb-2">Highlighted or color-coded notes.</li>
+                                    </ul>
+                                {% elif style == 'A' %}
+                                    <h4 class="text-info">Aural (A)</h4>
+                                    <h5 class="text-warning mt-4">Features:</h5>
+                                    <ul class="text-light">
+                                        <li class="mb-2">Prefers listening to spoken information (lectures, discussions, audio recordings).</li>
+                                        <li class="mb-2">Enjoys group discussions or debates to clarify concepts.</li>
+                                        <li class="mb-2">Learns well by repeating ideas aloud or discussing them with others.</li>
+                                        <li class="mb-2">Can recall information from tone, rhythm, or voice inflections.</li>
+                                        <li class="mb-2">May prefer reading text aloud or using mnemonic devices.</li>
+                                    </ul>
+                                    <h5 class="text-warning mt-4">Effective Learning Tools:</h5>
+                                    <ul class="text-light">
+                                        <li class="mb-2">Podcasts, audiobooks, and recorded lectures.</li>
+                                        <li class="mb-2">Group discussions or study groups.</li>
+                                        <li class="mb-2">Text-to-speech software.</li>
+                                        <li class="mb-2">Oral quizzes or verbal summaries.</li>
+                                    </ul>
+                                {% elif style == 'R' %}
+                                    <h4 class="text-info">Read/Write (R)</h4>
+                                    <h5 class="text-warning mt-4">Features:</h5>
+                                    <ul class="text-light">
+                                        <li class="mb-2">Prefers absorbing information through reading and creating text-based materials.</li>
+                                        <li class="mb-2">Takes detailed written notes during lectures.</li>
+                                        <li class="mb-2">Learns effectively by writing summaries, essays, or lists.</li>
+                                        <li class="mb-2">Enjoys reading and referencing books, articles, or printed materials.</li>
+                                        <li class="mb-2">Struggles with unstructured or overly visual content.</li>
+                                    </ul>
+                                    <h5 class="text-warning mt-4">Effective Learning Tools:</h5>
+                                    <ul class="text-light">
+                                        <li class="mb-2">Written instructions and detailed handouts.</li>
+                                        <li class="mb-2">Flashcards with text-based cues.</li>
+                                        <li class="mb-2">Books, journals, and online articles.</li>
+                                        <li class="mb-2">Writing summaries or structured outlines.</li>
+                                    </ul>
+                                {% else %}
+                                    <h4 class="text-info">Kinesthetic (K)</h4>
+                                    <h5 class="text-warning mt-4">Features:</h5>
+                                    <ul class="text-light">
+                                        <li class="mb-2">Prefers hands-on learning through direct experience and practice.</li>
+                                        <li class="mb-2">Thrives on real-world examples, demonstrations, and simulations.</li>
+                                        <li class="mb-2">Learns better by "doing" rather than observing or listening.</li>
+                                        <li class="mb-2">Engages well in lab work, role-playing, or physical activities.</li>
+                                        <li class="mb-2">Finds it easier to remember information connected to actions or physical sensations.</li>
+                                    </ul>
+                                    <h5 class="text-warning mt-4">Effective Learning Tools:</h5>
+                                    <ul class="text-light">
+                                        <li class="mb-2">Labs, experiments, and field trips.</li>
+                                        <li class="mb-2">Case studies or real-life problem-solving exercises.</li>
+                                        <li class="mb-2">Building models, manipulating objects, or creating prototypes.</li>
+                                        <li class="mb-2">Physical simulations or interactive activities.</li>
+                                    </ul>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="{% url 'learning_methods:learning' %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left"></i> {% trans "Back to Learning Methods" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
