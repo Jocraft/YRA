@@ -31,6 +31,11 @@ class LearningStyleTest(models.Model):
 
     class Meta:
         ordering = ['-date_taken']
-        
+    
+   
+       
     def __str__(self):
         return f"{self.student} - {self.date_taken.strftime('%Y-%m-%d %H:%M')}"
+    @classmethod
+    def get_tested_students_count(cls):
+        return cls.objects.values('student').distinct().count()

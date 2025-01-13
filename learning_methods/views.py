@@ -24,6 +24,7 @@ def learning_methods(request):
     context = {
         'active_page': 'learning_methods',
         'students': students,
+        'student_id': student_id,
         'selected_student': selected_student,
         'latest_test': latest_test,
     }

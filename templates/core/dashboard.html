@@ -35,7 +35,8 @@
 </div>
 
 <div class="row users-count px-3">
-    <div class="col-6 col-md-3 mb-3 px-2">
+    <!-- Students -->
+    <div class="col mb-3 px-2">
         <div class="card-count p-3">
             <h3><i class="fas fa-users bg-light-aqua"></i></h3>
             <div class="text-right">
@@ -44,16 +45,32 @@
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-3 mb-3 px-2">
+
+    <!-- Students Tested (Path-Finding Icon) -->
+    <div class="col mb-3 px-2">
         <div class="card-count p-3">
-            <h3><i class="fas fa-users bg-light-orange"></i></h3>
+            <h3><i class="fas fa-route bg-light-orange"></i></h3>
             <div class="text-right">
-                {% trans 'Students Tested' %}
-                <h2>{{ tested_students_count }}</h2>
+                {% trans 'Students Tested PF' %}
+                <h2>{{ path_tested_students_count }}</h2>
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-3 mb-3 px-2">
+
+    <!-- Students Tested 2 (Learning Method Icon) -->
+    <div class="col mb-3 px-2">
+        <div class="card-count p-3">
+            <!-- Make sure this is a valid icon for your Font Awesome version -->
+            <h3><i class="fas fa-chalkboard-teacher bg-light-green"></i></h3>
+            <div class="text-right">
+                {% trans 'Students Tested LM' %}
+                <h2>{{ learning_tested_students_count }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Administrators -->
+    <div class="col mb-3 px-2">
         <div class="card-count p-3">
             <h3><i class="fas fa-users bg-light-red"></i></h3>
             <div class="text-right">
@@ -62,21 +79,21 @@
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-3 mb-3 px-2">
+
+    <!-- Programs (Programs-Related Icon) -->
+    <div class="col mb-3 px-2">
         <div class="card-count p-3">
-            <h3><i class="fas fa-users bg-light-purple"></i></h3>
+            <h3><i class="fas fa-tasks bg-light-purple"></i></h3>
             <div class="text-right">
                 {% trans 'Programs' %}
-                <h2>{{ total_program_count }}</h2> 
+                <h2>{{ total_program_count }}</h2>
             </div>
         </div>
     </div>
 </div>
 
-<!--
-    REMOVE the "traffic" and "enrollment" chart columns entirely.
-    We also rename the "students_grade" canvas to "students_age".
--->
+
+
 
 <div class="row px-2">
     <!-- Just keep one chart for Students Age (replacing "students_grade"). -->
@@ -187,7 +204,8 @@ $(document).ready(function () {
           title: {
             display: true,
             text: gettext('Students Age Distribution'),
-            padding: 20
+            padding: 20,
+            color: 'rgb(75, 192, 192)'  
           },
           legend: {
             display: false  // optional if you don't want a legend
@@ -198,13 +216,15 @@ $(document).ready(function () {
             beginAtZero: true,
             title: {
               display: true,
-              text: gettext('Number of Students')
+              text: gettext('Number of Students'),
+              color: 'rgb(182, 182, 182)'
             }
           },
           x: {
             title: {
               display: true,
-              text: gettext('Age')
+              text: gettext('Age'),
+              color: 'rgb(182, 182, 182)'
             }
           }
         }
@@ -215,20 +235,23 @@ $(document).ready(function () {
     // 2) Students Gender Pie
     // ---------------------------------------------------------
     const dataGender = {
-        labels: [
-            gettext('Man'),
-            gettext('Women')
+      labels: [
+        gettext('Man'),
+        gettext('Women'),
+      ],
+      datasets: [{
+        label: gettext("Students Gender Dataset"),
+        data: [malesCount, femalesCount],
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)'
         ],
-        datasets: [{
-            label: gettext("Students Gender Dataset"),
-            data: [malesCount, femalesCount],
-            backgroundColor: [
-                'rgb(255, 99, 132)',
-                'rgb(54, 162, 235)'
-            ],
-            hoverOffset: 4
-        }]
+        hoverOffset: 4
+      }]
     };
+
+    // Customizing the legend labels color
+    Chart.defaults.plugins.legend.labels.color = 'rgb(182, 182, 182)'; // Change this to your desired color
 
     var gender = document.getElementById('gender');
     new Chart(gender, {
@@ -239,7 +262,9 @@ $(document).ready(function () {
                 title: {
                     display: true,
                     text: gettext('Students Gender'),
-                    padding: 20
+                    padding: 20,
+                    color: 'rgb(75, 192, 192)'  
+
                 }
             }
         }
@@ -277,7 +302,8 @@ $(document).ready(function () {
           title: {
             display: true,
             text: gettext('Student Levels'),
-            padding: 20
+            padding: 20,
+            color: 'rgb(75, 192, 192)'  
           }
         }
       }
@@ -326,7 +352,8 @@ $(document).ready(function () {
           title: {
             display: true,
             text: gettext('Student Colleges (Top 3 in Legend)'),
-            padding: 20
+            padding: 20,
+            color: 'rgb(75, 192, 192)'  
           }
         }
       }

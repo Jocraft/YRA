@@ -51,7 +51,7 @@
       <h4 class="mb-0">
         {% trans "Selected Student" %}: 
         <span class="text-warning">{{ selected_student }}</span>
-        , ID: <span class="text-warning">{{ student_id }}</span>, Enrollment Date: <span class="text-warning">{% if enrollment_date %}{{ enrollment_date }}{% else %}Not Available{% endif %}</span>
+        , ID: <span class="text-warning">{{ student_id }}</span>
       </h4>
     </div>
     <div class="col-auto d-flex align-items-center">
@@ -59,7 +59,7 @@
         <!-- If they have a session -->
         <span class="text-info me-3 d-flex align-items-center">
           <i class="fas fa-check-circle me-1"></i>
-          {% trans "This student has taken the test before." %}
+          {% trans "Last test taken on: " %}{{ latest_test }}
         </span>
         <a href="{% url 'create_test_session' selected_student.id %}" class="btn btn-primary me-2">
           <i class="fas fa-redo-alt"></i> {% trans "Retake Test" %}

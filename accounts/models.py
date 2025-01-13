@@ -323,6 +323,12 @@ class Student(models.Model):
             item["student__faculty"]: item["count"] 
             for item in data if item["student__faculty"]
         }
+    @classmethod
+    def get_student_count(cls):
+        """
+        Returns the total number of students.
+        """
+        return cls.objects.count()
 
     @classmethod
     def get_level_count(cls):
@@ -369,7 +375,7 @@ class Student(models.Model):
         # Deleting the student also deletes the associated User.
         self.student.delete()
         super().delete(*args, **kwargs)
-
+    
 class Parent(models.Model):
     """
     Connect student with their parent, parents can

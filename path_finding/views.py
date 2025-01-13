@@ -18,12 +18,14 @@ def path_finding_home(request):
     selected_student = None
     existing_session = None
     enrollment_date = None
+    latest_test=None
     if selected_student_id:
         selected_student = get_object_or_404(Student, pk=selected_student_id)
         # Grab the most recent session if you allow multiple attempts
         existing_session = TestSession.objects.filter(student=selected_student).first()
         user = selected_student.student  
         enrollment_date = user.enrollment_date
+        latest_test = TestSession.objects.filter(student=selected_student).first()
 
     context = {
         'students': students,
@@ -31,6 +33,7 @@ def path_finding_home(request):
         'existing_session': existing_session,
         'student_id': selected_student_id,
         'enrollment_date': enrollment_date,
+        "latest_test": latest_test,
 
 
     }

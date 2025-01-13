@@ -8,6 +8,7 @@ from course.models import Program
 from .forms import SessionForm, SemesterForm, NewsAndEventsForm
 from .models import NewsAndEvents, ActivityLog, Session, Semester
 from path_finding.models import TestSession
+from learning_methods.models import LearningStyleTest
 
 
 # ########################################################
@@ -34,7 +35,7 @@ def dashboard_view(request):
     total_program_count = Program.total_program_count()
     context = {
         # Existing context data:
-        'student_count': User.objects.get_student_count(),
+        'student_count': Student.get_student_count(),
         'lecturer_count': User.objects.get_lecturer_count(),
         'superuser_count': User.objects.get_superuser_count(),
         "logs": logs,
@@ -44,7 +45,8 @@ def dashboard_view(request):
         'student_colleges': colleges,
         'student_ages': student_ages,
         'total_program_count': total_program_count,
-        'tested_students_count': TestSession.get_tested_students_count(),
+        'path_tested_students_count': TestSession.get_tested_students_count(),
+        'learning_tested_students_count': LearningStyleTest.get_tested_students_count(),
     }
     return render(request, "core/dashboard.html", context)
 

@@ -34,9 +34,6 @@ class TestSession(models.Model):
     # Store LLM analysis results
     llm_analysis = models.TextField(blank=True, verbose_name="Career Analysis Results")
     
-    def __str__(self):
-        return f"TestSession #{self.id} for {self.student}"
-
     class Meta:
         ordering = ["-date_taken"]
 
@@ -44,7 +41,11 @@ class TestSession(models.Model):
     def get_tested_students_count(cls):
         """Returns the number of unique students who have taken the test"""
         return cls.objects.filter(is_complete=True).values('student').distinct().count()
-
+    
+    def __str__(self):
+        return f"{self.date_taken.strftime('%Y-%m-%d %H:%M')}"
+    
+    
 class TestAnswer(models.Model):
     test_session = models.ForeignKey(TestSession, on_delete=models.CASCADE, related_name='test_answers')
     question_id = models.PositiveIntegerField()
