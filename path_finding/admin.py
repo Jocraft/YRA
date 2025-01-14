@@ -1,7 +1,5 @@
-# path_finding/admin.py
-
 from django.contrib import admin
-from .models import TestSession, TestAnswer, Program
+from .models import Program, TestSession, TestAnswer, PathFindingLog
 
 @admin.register(Program)
 class ProgramAdmin(admin.ModelAdmin):
@@ -16,3 +14,8 @@ class TestSessionAdmin(admin.ModelAdmin):
 @admin.register(TestAnswer)
 class TestAnswerAdmin(admin.ModelAdmin):
     list_display = ('id', 'test_session', 'question_id', 'answer_text')
+
+@admin.register(PathFindingLog)
+class PathFindingLogAdmin(admin.ModelAdmin):
+    list_display = ('id', 'timestamp', 'student', 'message')
+    list_filter = ('timestamp', 'student')

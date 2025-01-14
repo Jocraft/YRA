@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+{% block title %}Upload Answers{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Upload Answers for {{ student }}</h2>
+  <p>The Excel file must have 13 columns: <em>Timestamp, Name, ID</em>, then <em>answers for 10 questions</em>.</p>
+  
+  <!-- Button or link to Google Form -->
+  <div class="mb-3">
+    <a 
+      href="https://docs.google.com/forms/u/0/d/e/1FAIpQLSexq3S8kGl-Br-pkawFaBonHpYd3089GsdbH5iQohpwijcONw/alreadyresponded?usp=send_form" 
+      class="btn btn-info" 
+      target="_blank"
+    >
+      <i class="fas fa-pencil-alt"></i> Fill Out Google Form
+    </a>
+  </div>
+
+  <!-- Existing upload form -->
+  <form method="POST" enctype="multipart/form-data" class="mb-3">
+    {% csrf_token %}
+    
+    <div class="mb-3">
+      <label for="excel_file" class="form-label">Select Excel File:</label>
+      <input
+        type="file"
+        class="form-control"
+        id="excel_file"
+        name="excel_file"
+        accept=".xlsx,.xls"
+        required
+      >
+    </div>
+    
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-upload"></i> Upload
+    </button>
+  </form>
+</div>
+{% endblock %}

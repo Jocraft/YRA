@@ -14,15 +14,13 @@
 
 <h1 class="title-1 mb-4">{% trans "Path Finding" %}</h1>
 
+<!-- Row for "Select Student" + (optionally) "Upload Bulk Data" -->
 <div class="row g-3 align-items-center mb-3">
-  <!-- Left column: label + dropdown -->
+  <!-- Label + Dropdown -->
   <div class="col-auto">
-    <label for="student_id" class="col-form-label fw-bold">
-      {% trans "Select Student" %}:
-    </label>
+    <label for="student_id" class="col-form-label fw-bold">{% trans "Select Student" %}:</label>
   </div>
   <div class="col-auto">
-    <!-- The GET form for the dropdown -->
     <form method="get" action="" class="mb-0">
       <select
         name="student_id"
@@ -42,21 +40,28 @@
       </select>
     </form>
   </div>
+  <!-- If no student is selected, show the Bulk Upload button in the same row -->
+  {% if not selected_student %}
+    <div class="col-auto">
+      <a href="{% url 'upload_bulk_answers' %}" class="btn btn-secondary">
+        <i class="fas fa-upload"></i> {% trans "Upload Bulk Data" %}
+      </a>
+    </div>
+  {% endif %}
 </div>
 
 {% if selected_student %}
-  <!-- We’ll put the “Selected Student” info + buttons in its own “row” -->
-  <div class="row g-3 align-items-center">
+  <!-- We have a selected student -->
+  <div class="row g-3 align-items-center mb-4">
     <div class="col-auto">
       <h4 class="mb-0">
-        {% trans "Selected Student" %}: 
-        <span class="text-warning">{{ selected_student }}</span>
-        , ID: <span class="text-warning">{{ student_id }}</span>
+        {% trans "Selected Student" %}:
+        <span class="text-warning">{{ selected_student }}</span>,
+        ID: <span class="text-warning">{{ student_id }}</span>
       </h4>
     </div>
     <div class="col-auto d-flex align-items-center">
       {% if existing_session %}
-        <!-- If they have a session -->
         <span class="text-info me-3 d-flex align-items-center">
           <i class="fas fa-check-circle me-1"></i>
           {% trans "Last test taken on: " %}{{ latest_test }}
@@ -64,19 +69,62 @@
         <a href="{% url 'create_test_session' selected_student.id %}" class="btn btn-primary me-2">
           <i class="fas fa-redo-alt"></i> {% trans "Retake Test" %}
         </a>
+        <a href="{% url 'upload_answers' selected_student.id %}" class="btn btn-secondary me-2">
+          <i class="fas fa-upload"></i> {% trans "Reupload Answers" %}
+        </a>
         <a href="{% url 'generate_results' existing_session.id %}" class="btn btn-success">
           <i class="fas fa-chart-bar"></i> {% trans "Generate Results" %}
         </a>
       {% else %}
-        <!-- If they have NOT taken the test -->
         <span class="text-warning me-3 d-flex align-items-center">
           <i class="fas fa-exclamation-circle me-1"></i>
           {% trans "This student has not taken the test yet." %}
         </span>
-        <a href="{% url 'create_test_session' selected_student.id %}" class="btn btn-primary">
+        <a href="{% url 'create_test_session' selected_student.id %}" class="btn btn-primary me-2">
           <i class="fas fa-play-circle"></i> {% trans "Take Test" %}
         </a>
+        <a href="{% url 'upload_answers' selected_student.id %}" class="btn btn-secondary">
+          <i class="fas fa-upload"></i> {% trans "Upload Answers" %}
+        </a>
       {% endif %}
+    </div>
+  </div>
+{% endif %}
+
+<!-- Bulk Upload Log (if any) -->
+{% if bulk_upload_log %}
+  <div class="alert alert-info mb-4">
+    <h5 class="mb-1">Bulk Upload Log</h5>
+    <ul class="mb-0" style="color: black;">
+      {% for line in bulk_upload_log %}
+        <li>{{ line }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+<!-- Recent Activity Log -->
+{% if all_logs %}
+  <!-- Wrap the heading and the button in one row -->
+    <div class="d-flex align-items-center justify-content-start mb-3">
+      <h4 class="mb-0 me-3" style="font-weight: bolder;">Recent Activity Log</h4>
+      <a href="{% url 'delete_logs' %}" class="btn btn-danger">
+        <i class="fas fa-trash-alt"></i> Delete Logs
+      </a>
+    </div>
+    <div class="card mb-4">
+    <div class="card-body">
+      <ul class="mb-0" style="list-style: none; padding-left: 0;">
+        {% for entry in all_logs %}
+          <li class="p-2 mb-1">
+            <strong>{{ entry.timestamp|date:"Y-m-d H:i:s" }}:</strong>
+            {% if entry.student %}
+              [{{ entry.student }} (ID={{ entry.student.id }})]
+            {% endif %}
+            {{ entry.message }}
+          </li>
+        {% endfor %}
+      </ul>
     </div>
   </div>
 {% endif %}
