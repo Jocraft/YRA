@@ -30,6 +30,7 @@
                 <tr>
                     <th>#</th>
                     <th>{% trans 'Program Name' %}</th>
+                    <th>{% trans 'Number of Students' %}</th>
                     <th>{% trans 'Summary' %}</th>
                     {% if request.user.is_superuser %}
                     <th>{% trans 'Action' %}</th>
@@ -45,6 +46,7 @@
                             {{ program.title}}
                         </a>
                     </td>
+                    <td>{{ program.student_set.count }}</td>
                     <td>{{ program.summary }} </td>
                     {% if request.user.is_superuser %}
                     <td>
