@@ -25,6 +25,10 @@
         <label for="group_by">Group By (Optional):</label>
         {{ form.group_by }}
       </div>
+      <div class="form-group visualization-type-group" style="display: none;">
+        <label for="visualization_type">Visualization Type:</label>
+        {{ form.visualization_type }}
+      </div>
       <button class="analysis-button" type="submit">Analyze</button>
     </form>
 
@@ -192,6 +196,22 @@ document.addEventListener('DOMContentLoaded', function() {
   if (tab) {
     switchTab(tab);
   }
+
+  // Show/hide visualization type based on selected column
+  const columnSelect = document.querySelector('[name="column"]');
+  const visualizationGroup = document.querySelector('.visualization-type-group');
+  
+  function toggleVisualizationType() {
+    const dateFields = ['date_of_birth', 'enrollment_date', 'expected_graduation_date'];
+    if (dateFields.includes(columnSelect.value)) {
+      visualizationGroup.style.display = 'block';
+    } else {
+      visualizationGroup.style.display = 'none';
+    }
+  }
+
+  columnSelect.addEventListener('change', toggleVisualizationType);
+  toggleVisualizationType(); // Initial check
 });
 </script>
 

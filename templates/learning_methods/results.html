@@ -25,30 +25,66 @@
 
                     <!-- Percentages Display -->
                     <div class="row mb-5">
-                        <div class="col-md-3">
-                            <div class="text-center mb-4 {% if 'V' in dominant_styles %}border border-warning rounded p-3{% endif %}">
-                                <h4 class="text-warning">Visual (V)</h4>
-                                <h2 class="display-4">{{ percentages.V|floatformat:1 }}%</h2>
+                        {% if group_count == '4' %}
+                            <!-- Original 4 groups display -->
+                            <div class="col-md-3">
+                                <div class="text-center mb-4 {% if 'V' in dominant_styles %}border border-warning rounded p-3{% endif %}">
+                                    <h4 class="text-warning">Visual (V)</h4>
+                                    <h2 class="display-4">{{ percentages.V|floatformat:1 }}%</h2>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="text-center mb-4 {% if 'A' in dominant_styles %}border border-warning rounded p-3{% endif %}">
-                                <h4 class="text-warning">Aural (A)</h4>
-                                <h2 class="display-4">{{ percentages.A|floatformat:1 }}%</h2>
+                            <div class="col-md-3">
+                                <div class="text-center mb-4 {% if 'A' in dominant_styles %}border border-warning rounded p-3{% endif %}">
+                                    <h4 class="text-warning">Aural (A)</h4>
+                                    <h2 class="display-4">{{ percentages.A|floatformat:1 }}%</h2>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="text-center mb-4 {% if 'R' in dominant_styles %}border border-warning rounded p-3{% endif %}">
-                                <h4 class="text-warning">Read/Write (R)</h4>
-                                <h2 class="display-4">{{ percentages.R|floatformat:1 }}%</h2>
+                            <div class="col-md-3">
+                                <div class="text-center mb-4 {% if 'R' in dominant_styles %}border border-warning rounded p-3{% endif %}">
+                                    <h4 class="text-warning">Read/Write (R)</h4>
+                                    <h2 class="display-4">{{ percentages.R|floatformat:1 }}%</h2>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="text-center mb-4 {% if 'K' in dominant_styles %}border border-warning rounded p-3{% endif %}">
-                                <h4 class="text-warning">Kinesthetic (K)</h4>
-                                <h2 class="display-4">{{ percentages.K|floatformat:1 }}%</h2>
+                            <div class="col-md-3">
+                                <div class="text-center mb-4 {% if 'K' in dominant_styles %}border border-warning rounded p-3{% endif %}">
+                                    <h4 class="text-warning">Kinesthetic (K)</h4>
+                                    <h2 class="display-4">{{ percentages.K|floatformat:1 }}%</h2>
+                                </div>
                             </div>
-                        </div>
+                        {% else %}
+                            <!-- Combined groups display -->
+                            {% if group_count == '2' or group_count == '3' %}
+                                <div class="col-md-{% if group_count == '2' %}6{% else %}4{% endif %}">
+                                    <div class="text-center mb-4 {% if 'VA' in dominant_styles %}border border-warning rounded p-3{% endif %}">
+                                        <h4 class="text-warning">Visual-Aural (VA)</h4>
+                                        <h2 class="display-4">{{ combined_groups.VA|floatformat:1 }}%</h2>
+                                        <div class="small text-muted mt-2">
+                                            V: {{ percentages.V|floatformat:1 }}% | A: {{ percentages.A|floatformat:1 }}%
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-{% if group_count == '2' %}6{% else %}4{% endif %}">
+                                    <div class="text-center mb-4 {% if 'RK' in dominant_styles %}border border-warning rounded p-3{% endif %}">
+                                        <h4 class="text-warning">Read/Write-Kinesthetic (RK)</h4>
+                                        <h2 class="display-4">{{ combined_groups.RK|floatformat:1 }}%</h2>
+                                        <div class="small text-muted mt-2">
+                                            R: {{ percentages.R|floatformat:1 }}% | K: {{ percentages.K|floatformat:1 }}%
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if group_count == '3' and 'S' in combined_groups %}
+                                    <div class="col-md-4">
+                                        <div class="text-center mb-4 {% if 'S' in dominant_styles %}border border-warning rounded p-3{% endif %}">
+                                            <h4 class="text-warning">Special Class (S)</h4>
+                                            <h2 class="display-4">{{ combined_groups.S|floatformat:1 }}%</h2>
+                                            <div class="small text-muted mt-2">
+                                                Balanced across all styles
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
                     </div>
 
                     <!-- Dominant Style Details -->
@@ -67,12 +103,6 @@
                                         <li class="mb-2">Learns better through observing patterns and relationships.</li>
                                         <li class="mb-2">Struggles with dense blocks of text without visuals.</li>
                                     </ul>
-                                    <h5 class="text-warning mt-4">Effective Learning Tools:</h5>
-                                    <ul class="text-light">
-                                        <li class="mb-2">PowerPoint presentations with diagrams and images.</li>
-                                        <li class="mb-2">Concept mapping and visual flowcharts.</li>
-                                        <li class="mb-2">Highlighted or color-coded notes.</li>
-                                    </ul>
                                 {% elif style == 'A' %}
                                     <h4 class="text-info">Aural (A)</h4>
                                     <h5 class="text-warning mt-4">Features:</h5>
@@ -82,13 +112,6 @@
                                         <li class="mb-2">Learns well by repeating ideas aloud or discussing them with others.</li>
                                         <li class="mb-2">Can recall information from tone, rhythm, or voice inflections.</li>
                                         <li class="mb-2">May prefer reading text aloud or using mnemonic devices.</li>
-                                    </ul>
-                                    <h5 class="text-warning mt-4">Effective Learning Tools:</h5>
-                                    <ul class="text-light">
-                                        <li class="mb-2">Podcasts, audiobooks, and recorded lectures.</li>
-                                        <li class="mb-2">Group discussions or study groups.</li>
-                                        <li class="mb-2">Text-to-speech software.</li>
-                                        <li class="mb-2">Oral quizzes or verbal summaries.</li>
                                     </ul>
                                 {% elif style == 'R' %}
                                     <h4 class="text-info">Read/Write (R)</h4>
@@ -100,14 +123,7 @@
                                         <li class="mb-2">Enjoys reading and referencing books, articles, or printed materials.</li>
                                         <li class="mb-2">Struggles with unstructured or overly visual content.</li>
                                     </ul>
-                                    <h5 class="text-warning mt-4">Effective Learning Tools:</h5>
-                                    <ul class="text-light">
-                                        <li class="mb-2">Written instructions and detailed handouts.</li>
-                                        <li class="mb-2">Flashcards with text-based cues.</li>
-                                        <li class="mb-2">Books, journals, and online articles.</li>
-                                        <li class="mb-2">Writing summaries or structured outlines.</li>
-                                    </ul>
-                                {% else %}
+                                {% elif style == 'K' %}
                                     <h4 class="text-info">Kinesthetic (K)</h4>
                                     <h5 class="text-warning mt-4">Features:</h5>
                                     <ul class="text-light">
@@ -117,12 +133,35 @@
                                         <li class="mb-2">Engages well in lab work, role-playing, or physical activities.</li>
                                         <li class="mb-2">Finds it easier to remember information connected to actions or physical sensations.</li>
                                     </ul>
-                                    <h5 class="text-warning mt-4">Effective Learning Tools:</h5>
+                                {% elif style == 'VA' %}
+                                    <h4 class="text-info">Visual-Aural (VA)</h4>
+                                    <h5 class="text-warning mt-4">Features:</h5>
                                     <ul class="text-light">
-                                        <li class="mb-2">Labs, experiments, and field trips.</li>
-                                        <li class="mb-2">Case studies or real-life problem-solving exercises.</li>
-                                        <li class="mb-2">Building models, manipulating objects, or creating prototypes.</li>
-                                        <li class="mb-2">Physical simulations or interactive activities.</li>
+                                        <li class="mb-2">Strong preference for both visual and auditory learning methods.</li>
+                                        <li class="mb-2">Benefits from multimedia presentations combining visuals with spoken explanations.</li>
+                                        <li class="mb-2">Learns well through video content with narration.</li>
+                                        <li class="mb-2">Enjoys visual demonstrations with verbal explanations.</li>
+                                        <li class="mb-2">Effective at combining visual note-taking with verbal discussions.</li>
+                                    </ul>
+                                {% elif style == 'RK' %}
+                                    <h4 class="text-info">Read/Write-Kinesthetic (RK)</h4>
+                                    <h5 class="text-warning mt-4">Features:</h5>
+                                    <ul class="text-light">
+                                        <li class="mb-2">Combines text-based learning with hands-on experience.</li>
+                                        <li class="mb-2">Learns best through practical exercises with written instructions.</li>
+                                        <li class="mb-2">Benefits from documenting experiences and experiments.</li>
+                                        <li class="mb-2">Enjoys interactive learning with written components.</li>
+                                        <li class="mb-2">Effective at applying theoretical knowledge to practical situations.</li>
+                                    </ul>
+                                {% elif style == 'S' %}
+                                    <h4 class="text-info">Special Class (S)</h4>
+                                    <h5 class="text-warning mt-4">Features:</h5>
+                                    <ul class="text-light">
+                                        <li class="mb-2">Shows balanced aptitude across all learning styles.</li>
+                                        <li class="mb-2">Adapts well to different teaching methods and environments.</li>
+                                        <li class="mb-2">Can effectively utilize multiple learning strategies.</li>
+                                        <li class="mb-2">Benefits from varied and mixed learning approaches.</li>
+                                        <li class="mb-2">Versatile learner who can engage with content in multiple ways.</li>
                                     </ul>
                                 {% endif %}
                             </div>
@@ -130,7 +169,7 @@
                     </div>
 
                     <div class="text-center mt-4">
-                        <a href="{% url 'learning_methods:learning' %}" class="btn btn-primary">
+                        <a href="{% url 'learning_methods:learning' %}?student={{ student_id }}&group_count={{ group_count }}" class="btn btn-primary">
                             <i class="fas fa-arrow-left"></i> {% trans "Back to Learning Methods" %}
                         </a>
                     </div>

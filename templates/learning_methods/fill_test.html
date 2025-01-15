@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n static %}
+{% load learning_methods_tags %}
 
 {% block title %}{% trans "Learning Style Test" %}{% endblock %}
 
@@ -17,32 +18,69 @@
     <div class="row justify-content-center align-items-center" style="padding: 80px 0;">
         <div class="col-12 col-md-10 col-lg-8">
             <div class="card shadow-lg border-0 text-light" style="background-color: #2b3458;">
-                <div class="card-body p-5">
+                <div class="card-body p-5" {% if current_lang == 'ar' %}dir="rtl"{% endif %}>
+                    <!-- Language Switch Form -->
+                    <div class="text-end mb-4" {% if current_lang == 'ar' %}dir="ltr"{% endif %}>
+                        <form id="langSwitchForm" method="POST" style="display: inline-block;">
+                            {% csrf_token %}
+                            <div class="btn-group" role="group" aria-label="Language Switch">
+                                <button type="submit" 
+                                        name="lang" 
+                                        value="en"
+                                        class="btn {% if current_lang == 'en' %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                                        {% if current_lang == 'en' %}disabled{% endif %}>
+                                    English
+                                </button>
+                                <button type="submit" 
+                                        name="lang" 
+                                        value="ar"
+                                        class="btn {% if current_lang == 'ar' %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                                        {% if current_lang == 'ar' %}disabled{% endif %}>
+                                    العربية
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
                     <h2 class="card-title text-info mb-4">
                         <i class="bi bi-question-circle-fill me-2"></i> 
-                        {% trans "Learning Style Assessment" %}
+                        {% if current_lang == 'ar' %}
+                            تقييم نمط التعلم
+                        {% else %}
+                            {% trans "Learning Style Assessment" %}
+                        {% endif %}
                     </h2>
 
                     <p class="text-light mb-4">
-                        {% trans "Please select all answers that apply to you for each question." %}
+                        {% if current_lang == 'ar' %}
+                            الرجاء اختيار جميع الإجابات التي تنطبق عليك لكل سؤال.
+                        {% else %}
+                            {% trans "Please select all answers that apply to you for each question." %}
+                        {% endif %}
                     </p>
 
                     <form method="POST" action="" id="testForm">
                         {% csrf_token %}
+                        <input type="hidden" name="submit_test" value="1">
 
                         {% for question in questions %}
                         <div class="mb-4">
                             <label class="form-label fw-bold text-warning">
-                                {% trans "Question" %} {{ forloop.counter }}: {{ question.text }}
+                                {% if current_lang == 'ar' %}
+                                    السؤال {{ forloop.counter }}: {{ question.text }}
+                                {% else %}
+                                    {% trans "Question" %} {{ forloop.counter }}: {{ question.text }}
+                                {% endif %}
                             </label>
-                            <div class="ms-3">
+                            <div class="ms-3 {% if current_lang == 'ar' %}me-3 ms-0{% endif %}">
                                 {% for option in question.options %}
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" 
+                                    <input class="form-check-input answer-checkbox {% if current_lang == 'ar' %}ms-0 me-2{% endif %}" 
                                            type="checkbox" 
                                            name="q{{ forloop.parentloop.counter }}" 
                                            value="{{ option.value }}"
-                                           id="q{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
+                                           id="q{{ forloop.parentloop.counter }}_{{ forloop.counter }}"
+                                           {% if saved_answers and option.value in saved_answers|get_item:forloop.parentloop.counter %}checked{% endif %}>
                                     <label class="form-check-label text-light" 
                                            for="q{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
                                         {{ option.text }}
@@ -55,7 +93,11 @@
 
                         <button type="submit" class="btn btn-primary w-100 mt-4">
                             <i class="bi bi-send-fill"></i> 
-                            {% trans "Submit" %}
+                            {% if current_lang == 'ar' %}
+                                إرسال
+                            {% else %}
+                                {% trans "Submit" %}
+                            {% endif %}
                         </button>
                     </form>
                 </div>
@@ -65,6 +107,34 @@
 </div>
 
 <script>
+// Copy answers to language switch form before submission
+document.querySelectorAll('.answer-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        updateLangSwitchForm();
+    });
+});
+
+function updateLangSwitchForm() {
+    const langForm = document.getElementById('langSwitchForm');
+    const checkboxes = document.querySelectorAll('.answer-checkbox:checked');
+    
+    // Remove any existing answer inputs
+    langForm.querySelectorAll('input[name^="q"]').forEach(input => input.remove());
+    
+    // Add current answers as hidden inputs
+    checkboxes.forEach(checkbox => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = checkbox.name;
+        input.value = checkbox.value;
+        langForm.appendChild(input);
+    });
+}
+
+// Initial update of language switch form
+updateLangSwitchForm();
+
+// Form validation
 document.getElementById('testForm').addEventListener('submit', function(e) {
     // Check if at least one option is selected for each question
     let questions = {{ questions|length }};
@@ -72,7 +142,11 @@ document.getElementById('testForm').addEventListener('submit', function(e) {
         let checkboxes = document.querySelectorAll(`input[name="q${i}"]:checked`);
         if (checkboxes.length === 0) {
             e.preventDefault();
-            alert(`Please select at least one option for question ${i}`);
+            {% if current_lang == 'ar' %}
+                alert(`الرجاء اختيار إجابة واحدة على الأقل للسؤال ${i}`);
+            {% else %}
+                alert(`Please select at least one option for question ${i}`);
+            {% endif %}
             return;
         }
     }
