@@ -10,7 +10,7 @@ from .models import TestSession, Program, PathFindingLog
 # from course.models import Program
 # Adjust as needed.)
 
-from .questions import QUESTIONS
+from .questions import QUESTIONS, QUESTIONS_AR
 from .llm_analyzer import analyze_answer  # Assume you have a custom LLM logic
 
 ################################
@@ -85,9 +85,28 @@ def fill_test_view(request, session_id):
     Page where the student manually answers the test (HTML form).
     """
     session = get_object_or_404(TestSession, pk=session_id)
+    
+    # Get language preference from query parameter, default to English
+    lang = request.GET.get('lang', 'en')
+    questions = QUESTIONS_AR if lang == 'ar' else QUESTIONS
 
     if request.method == 'POST':
-        # Map question numbers to model fields
+        # Get all answers from the form
+        answers = {}
+        for question in questions:
+            answer_text = request.POST.get(f'q{question["order"]}')
+            if answer_text:
+                answers[f'q{question["order"]}'] = answer_text
+
+        # If this is a language switch
+        if 'switch_lang' in request.POST:
+            # Save answers to session
+            request.session[f'temp_answers_{session_id}'] = answers
+            # Redirect to same page with new language
+            new_lang = 'ar' if lang == 'en' else 'en'
+            return redirect(f'{request.path}?lang={new_lang}')
+
+        # If this is the final submission
         field_mapping = {
             1: 'q1_numbers',
             2: 'q2_math',
@@ -101,8 +120,9 @@ def fill_test_view(request, session_id):
             10: 'q10_goals'
         }
 
-        for question in QUESTIONS:
-            answer_text = request.POST.get(f'q{question["order"]}')
+        # Save answers to database
+        for question in questions:
+            answer_text = answers.get(f'q{question["order"]}')
             if answer_text:
                 field_name = field_mapping[question['order']]
                 setattr(session, field_name, answer_text)
@@ -110,14 +130,22 @@ def fill_test_view(request, session_id):
         session.is_complete = True
         session.save()
 
+        # Clear temporary answers from session
+        if f'temp_answers_{session_id}' in request.session:
+            del request.session[f'temp_answers_{session_id}']
+
         # Log
         add_log_entry(session.student, f"Manually filled answers for TestSession (id={session.id}).")
-
         return redirect('generate_results', session_id=session.id)
+
+    # Get saved answers from session if they exist
+    saved_answers = request.session.get(f'temp_answers_{session_id}', {})
 
     return render(request, 'path_finding/fill_test.html', {
         'session': session,
-        'questions': QUESTIONS
+        'questions': questions,
+        'current_lang': lang,
+        'saved_answers': saved_answers
     })
 
 

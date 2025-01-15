@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n static %}
+{% load i18n static path_finding_extras %}
 
 {% block title %}Take the Test{% endblock %}
 
@@ -17,16 +17,31 @@
         <div class="col-12 col-md-10 col-lg-8 col-xl-6">
             <div class="card shadow-lg border-0 text-light" style="background-color: #2b3458;">
                 <div class="card-body p-5">
-                    <h2 class="card-title text-info mb-4">
-                        <i class="bi bi-question-circle-fill me-2"></i> 
-                        {% trans "Career Path Assessment" %}
-                    </h2>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="card-title text-info mb-0">
+                            <i class="bi bi-question-circle-fill me-2"></i> 
+                            {% trans "Career Path Assessment" %}
+                        </h2>
+                        
+                        <!-- Language Switch Form -->
+                        <form method="POST" class="d-inline" id="langSwitchForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="switch_lang" value="1">
+                            <button type="submit" class="btn btn-outline-info">
+                                {% if current_lang == 'ar' %}
+                                    English
+                                {% else %}
+                                    العربية
+                                {% endif %}
+                            </button>
+                        </form>
+                    </div>
 
                     <p class="text-light mb-4">
                         {% trans "Please answer these questions thoughtfully to help us understand your interests, strengths, and career aspirations." %}
                     </p>
 
-                    <form method="POST" action="">
+                    <form method="POST" action="" id="testForm">
                         {% csrf_token %}
 
                         {% for question in questions %}
@@ -37,11 +52,11 @@
                             <textarea
                                 name="q{{ question.order }}"
                                 id="q{{ question.order }}"
-                                class="form-control bg-secondary text-light"
+                                class="form-control bg-secondary text-light answer-field"
                                 rows="3"
                                 placeholder="{% trans 'Type your answer...' %}"
                                 required
-                            ></textarea>
+                            >{{ saved_answers|get_answer:question.order }}</textarea>
                         </div>
                         {% endfor %}
 
@@ -55,4 +70,47 @@
         </div>
     </div>
 </div>
+
+<script>
+// Update language switch form with current answers before submission
+document.querySelectorAll('.answer-field').forEach(field => {
+    field.addEventListener('input', function() {
+        updateLangSwitchForm();
+    });
+});
+
+function updateLangSwitchForm() {
+    const langForm = document.getElementById('langSwitchForm');
+    const answerFields = document.querySelectorAll('.answer-field');
+    
+    // Remove any existing answer inputs
+    langForm.querySelectorAll('input[name^="q"]').forEach(input => input.remove());
+    
+    // Add current answers as hidden inputs
+    answerFields.forEach(field => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = field.name;
+        input.value = field.value;
+        langForm.appendChild(input);
+    });
+}
+
+// Initial update of language switch form
+updateLangSwitchForm();
+
+// Form validation
+document.getElementById('testForm').addEventListener('submit', function(e) {
+    const emptyFields = Array.from(document.querySelectorAll('.answer-field')).filter(field => !field.value.trim());
+    if (emptyFields.length > 0) {
+        e.preventDefault();
+        {% if current_lang == 'ar' %}
+            alert('الرجاء الإجابة على جميع الأسئلة قبل التقديم.');
+        {% else %}
+            alert('Please answer all questions before submitting.');
+        {% endif %}
+        emptyFields[0].focus();
+    }
+});
+</script>
 {% endblock %}
