@@ -3,6 +3,8 @@ from accounts.models import Student, User
 
 class AnalysisForm(forms.Form):
     def __init__(self, *args, **kwargs):
+        # Get the years from the request if available
+        available_years = kwargs.pop('available_years', [])
         super().__init__(*args, **kwargs)
 
         # Dynamically get the field names from the User and Student models
@@ -58,5 +60,13 @@ class AnalysisForm(forms.Form):
             ],
             required=False,
             label="Visualization Type (for date fields)"
+        )
+
+        # Add year filter field
+        year_choices = [('', 'All Years')] + [(str(year), str(year)) for year in available_years]
+        self.fields['selected_year'] = forms.ChoiceField(
+            choices=year_choices,
+            required=False,
+            label="Filter by Year"
         )
 

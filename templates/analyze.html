@@ -29,6 +29,10 @@
         <label for="visualization_type">Visualization Type:</label>
         {{ form.visualization_type }}
       </div>
+      <div class="form-group year-filter-group" style="display: none;">
+        <label for="selected_year">Filter by Year:</label>
+        {{ form.selected_year }}
+      </div>
       <button class="analysis-button" type="submit">Analyze</button>
     </form>
 
@@ -197,21 +201,40 @@ document.addEventListener('DOMContentLoaded', function() {
     switchTab(tab);
   }
 
-  // Show/hide visualization type based on selected column
+  // Show/hide visualization type and year filter based on selected column
   const columnSelect = document.querySelector('[name="column"]');
   const visualizationGroup = document.querySelector('.visualization-type-group');
+  const yearFilterGroup = document.querySelector('.year-filter-group');
+  const visualizationSelect = document.querySelector('[name="visualization_type"]');
   
   function toggleVisualizationType() {
     const dateFields = ['date_of_birth', 'enrollment_date', 'expected_graduation_date'];
-    if (dateFields.includes(columnSelect.value)) {
-      visualizationGroup.style.display = 'block';
+    const isDateField = dateFields.includes(columnSelect.value);
+    visualizationGroup.style.display = isDateField ? 'block' : 'none';
+    
+    // Also toggle year filter if visualization type is 'date'
+    if (isDateField && visualizationSelect.value === 'date') {
+      yearFilterGroup.style.display = 'block';
     } else {
-      visualizationGroup.style.display = 'none';
+      yearFilterGroup.style.display = 'none';
+    }
+  }
+
+  function toggleYearFilter() {
+    const dateFields = ['date_of_birth', 'enrollment_date', 'expected_graduation_date'];
+    if (dateFields.includes(columnSelect.value) && visualizationSelect.value === 'date') {
+      yearFilterGroup.style.display = 'block';
+    } else {
+      yearFilterGroup.style.display = 'none';
     }
   }
 
   columnSelect.addEventListener('change', toggleVisualizationType);
-  toggleVisualizationType(); // Initial check
+  visualizationSelect.addEventListener('change', toggleYearFilter);
+  
+  // Initial check
+  toggleVisualizationType();
+  toggleYearFilter();
 });
 </script>
 

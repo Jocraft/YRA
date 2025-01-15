@@ -11,7 +11,33 @@ import plotly.graph_objects as go
 
 
 def analyze(request):
-    form = AnalysisForm(request.POST or None)
+    # Get initial data for the form
+    initial_data = {}
+    available_years = []
+    
+    if request.method == 'POST':
+        column = request.POST.get('column')
+        visualization_type = request.POST.get('visualization_type', 'numerical')
+        
+        if visualization_type == 'date' and column:
+            students = Student.objects.all()
+            users = User.objects.filter(id__in=[student.student.id for student in students if student.student]).all()
+            
+            # Get dates based on column
+            if column == 'date_of_birth':
+                dates = [user.date_of_birth for user in users if user.date_of_birth]
+            elif column == 'enrollment_date':
+                dates = [user.enrollment_date for user in users if user.enrollment_date]
+            elif column == 'expected_graduation_date':
+                dates = [user.expected_graduation_date for user in users if user.expected_graduation_date]
+            else:
+                dates = []
+            
+            # Get unique years
+            available_years = sorted(list(set(date.year for date in dates if date)))
+    
+    # Initialize form with available years
+    form = AnalysisForm(request.POST or None, available_years=available_years)
     plot_html = None
     statistics = None
     column_values = None
@@ -22,6 +48,7 @@ def analyze(request):
         column = form.cleaned_data['column']
         group_by = form.cleaned_data.get('group_by')
         visualization_type = form.cleaned_data.get('visualization_type', 'numerical')
+        selected_year = form.cleaned_data.get('selected_year')
 
         students = Student.objects.all()
         users = User.objects.filter(id__in=[student.student.id for student in students if student.student]).all()
@@ -145,62 +172,165 @@ def analyze(request):
 
             else:  # Descriptive analysis
                 if visualization_type == 'date' and original_dates:
-                    # Date-based visualization code (unchanged)
+                    # Date-based visualization code
                     df['date'] = pd.to_datetime(original_dates)
-                    df = df.sort_values('date')
                     
-                    fig = make_subplots(rows=2, cols=2,
-                                      subplot_titles=("Timeline Distribution",
-                                                    "Monthly Distribution",
-                                                    "Yearly Distribution",
-                                                    "Cumulative Distribution"))
+                    # Filter by year if selected
+                    if selected_year:
+                        df = df[df['date'].dt.year == int(selected_year)]
+                    
+                    if df.empty:
+                        statistics = {'Message': f'No data available for year {selected_year}'}
+                    else:
+                        df = df.sort_values('date')
+                        
+                        if selected_year:
+                            # Single bar plot for selected year
+                            df['month'] = df['date'].dt.month
+                            month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                            
+                            if 'group_by' in df.columns:
+                                # Create pivot table for grouped monthly data
+                                monthly_grouped = pd.pivot_table(
+                                    df,
+                                    values='date',
+                                    index='month',
+                                    columns='group_by',
+                                    aggfunc='count',
+                                    fill_value=0
+                                ).reindex(range(1, 13), fill_value=0)
+                                
+                                # Rename index with month names
+                                monthly_grouped.index = month_names
+                                
+                                fig = go.Figure()
+                                
+                                # Add bars for each group
+                                for group in monthly_grouped.columns:
+                                    fig.add_trace(go.Bar(
+                                        name=str(group),
+                                        x=month_names,
+                                        y=monthly_grouped[group],
+                                        text=monthly_grouped[group],
+                                        textposition='auto'
+                                    ))
+                                
+                                fig.update_layout(
+                                    title_text=f"Monthly Distribution for {column} by {group_by} in {selected_year}",
+                                    xaxis_title="Month",
+                                    yaxis_title="Count",
+                                    height=500,
+                                    barmode='group',
+                                    bargap=0.2,
+                                    showlegend=True
+                                )
+                                
+                                # Update statistics for grouped data
+                                statistics = {
+                                    'Year Statistics': {
+                                        'Total Count': len(df),
+                                        'Group Totals': monthly_grouped.sum().to_dict(),
+                                        'Most Common Month by Group': {
+                                            str(group): month_names[monthly_grouped[group].argmax()]
+                                            for group in monthly_grouped.columns
+                                        }
+                                    }
+                                }
+                            
+                            else:
+                                # Original single group visualization
+                                monthly_counts = df['month'].value_counts().sort_index()
+                                
+                                # Create a complete series with all months (1-12)
+                                all_months = pd.Series(0, index=range(1, 13))
+                                # Update with actual counts
+                                all_months.update(monthly_counts)
+                                # Sort to ensure months are in order
+                                monthly_counts = all_months.sort_index()
+                                
+                                fig = go.Figure()
+                                fig.add_trace(go.Bar(
+                                    x=month_names,
+                                    y=monthly_counts.values,
+                                    name='Count',
+                                    text=monthly_counts.values,
+                                    textposition='auto'
+                                ))
+                                
+                                fig.update_layout(
+                                    title_text=f"Monthly Distribution for {column} in {selected_year}",
+                                    xaxis_title="Month",
+                                    yaxis_title="Count",
+                                    height=500,
+                                    showlegend=False,
+                                    bargap=0.2
+                                )
+                                
+                                # Update statistics to use the complete monthly counts
+                                max_month_idx = monthly_counts.idxmax() - 1  # Convert to 0-based index
+                                statistics = {
+                                    'Year Statistics': {
+                                        'Total Count': len(df),
+                                        'Most Common Month': month_names[max_month_idx],
+                                        'Highest Count': monthly_counts.max(),
+                                        'Average Monthly Count': f"{monthly_counts.mean():.1f}"
+                                    }
+                                }
+                        else:
+                            # Original four plots for all years
+                            fig = make_subplots(rows=2, cols=2,
+                                              subplot_titles=("Timeline Distribution",
+                                                            "Monthly Distribution",
+                                                            "Yearly Distribution",
+                                                            "Cumulative Distribution"))
 
-                    # Timeline plot
-                    fig.add_trace(go.Scatter(x=df['date'], y=[1]*len(df), mode='markers',
-                                           name='Individual Dates'), row=1, col=1)
+                            # Timeline plot
+                            fig.add_trace(go.Scatter(x=df['date'], y=[1]*len(df), mode='markers',
+                                                   name='Individual Dates'), row=1, col=1)
 
-                    # Monthly distribution
-                    monthly_counts = df['date'].dt.month.value_counts().sort_index()
-                    fig.add_trace(go.Bar(x=monthly_counts.index, y=monthly_counts.values,
-                                       name='Monthly Distribution'), row=1, col=2)
+                            # Monthly distribution
+                            monthly_counts = df['date'].dt.month.value_counts().sort_index()
+                            fig.add_trace(go.Bar(x=monthly_counts.index, y=monthly_counts.values,
+                                               name='Monthly Distribution'), row=1, col=2)
 
-                    # Yearly distribution
-                    yearly_counts = df['date'].dt.year.value_counts().sort_index()
-                    fig.add_trace(go.Bar(x=yearly_counts.index, y=yearly_counts.values,
-                                       name='Yearly Distribution'), row=2, col=1)
+                            # Yearly distribution
+                            yearly_counts = df['date'].dt.year.value_counts().sort_index()
+                            fig.add_trace(go.Bar(x=yearly_counts.index, y=yearly_counts.values,
+                                               name='Yearly Distribution'), row=2, col=1)
 
-                    # Cumulative distribution
-                    df_sorted = df.sort_values('date')
-                    df_sorted['cumcount'] = range(1, len(df_sorted) + 1)
-                    fig.add_trace(go.Scatter(x=df_sorted['date'], y=df_sorted['cumcount'],
-                                           name='Cumulative Count'), row=2, col=2)
+                            # Cumulative distribution
+                            df_sorted = df.sort_values('date')
+                            df_sorted['cumcount'] = range(1, len(df_sorted) + 1)
+                            fig.add_trace(go.Scatter(x=df_sorted['date'], y=df_sorted['cumcount'],
+                                                   name='Cumulative Count'), row=2, col=2)
 
-                    fig.update_layout(height=800, showlegend=True,
-                                    title_text=f"Date-based Analysis of {column}",
-                                    title_x=0.5)
+                            fig.update_layout(height=800, showlegend=True,
+                                            title_text=f"Date-based Analysis of {column}",
+                                            title_x=0.5)
 
-                    fig.update_xaxes(title_text="Date", row=1, col=1)
-                    fig.update_yaxes(title_text="Count", row=1, col=1)
-                    fig.update_xaxes(title_text="Month", row=1, col=2)
-                    fig.update_yaxes(title_text="Count", row=1, col=2)
-                    fig.update_xaxes(title_text="Year", row=2, col=1)
-                    fig.update_yaxes(title_text="Count", row=2, col=1)
-                    fig.update_xaxes(title_text="Date", row=2, col=2)
-                    fig.update_yaxes(title_text="Cumulative Count", row=2, col=2)
+                            fig.update_xaxes(title_text="Date", row=1, col=1)
+                            fig.update_yaxes(title_text="Count", row=1, col=1)
+                            fig.update_xaxes(title_text="Month", row=1, col=2)
+                            fig.update_yaxes(title_text="Count", row=1, col=2)
+                            fig.update_xaxes(title_text="Year", row=2, col=1)
+                            fig.update_yaxes(title_text="Count", row=2, col=1)
+                            fig.update_xaxes(title_text="Date", row=2, col=2)
+                            fig.update_yaxes(title_text="Cumulative Count", row=2, col=2)
 
-                    plot_html = fig.to_html(full_html=False)
+                            statistics = {
+                                'Date Range': {
+                                    'Start': df['date'].min().strftime('%Y-%m-%d'),
+                                    'End': df['date'].max().strftime('%Y-%m-%d')
+                                },
+                                'Distribution': {
+                                    'Most Common Year': yearly_counts.index[0],
+                                    'Most Common Month': monthly_counts.index[0],
+                                    'Total Count': len(df)
+                                }
+                            }
 
-                    statistics = {
-                        'Date Range': {
-                            'Start': df['date'].min().strftime('%Y-%m-%d'),
-                            'End': df['date'].max().strftime('%Y-%m-%d')
-                        },
-                        'Distribution': {
-                            'Most Common Year': yearly_counts.index[0],
-                            'Most Common Month': monthly_counts.index[0],
-                            'Total Count': len(df)
-                        }
-                    }
+                        plot_html = fig.to_html(full_html=False)
 
                 elif pd.api.types.is_numeric_dtype(df['column']):
                     # Numeric data visualization
