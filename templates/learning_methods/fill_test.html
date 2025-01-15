@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n static %}
-{% load learning_methods_tags %}
+{% load i18n static learning_methods_tags %}
 
 {% block title %}{% trans "Learning Style Test" %}{% endblock %}
 
@@ -23,22 +22,14 @@
                     <div class="text-end mb-4" {% if current_lang == 'ar' %}dir="ltr"{% endif %}>
                         <form id="langSwitchForm" method="POST" style="display: inline-block;">
                             {% csrf_token %}
-                            <div class="btn-group" role="group" aria-label="Language Switch">
-                                <button type="submit" 
-                                        name="lang" 
-                                        value="en"
-                                        class="btn {% if current_lang == 'en' %}btn-primary{% else %}btn-outline-primary{% endif %}"
-                                        {% if current_lang == 'en' %}disabled{% endif %}>
+                            <input type="hidden" name="lang" value="{{ current_lang }}">
+                            <button type="submit" class="btn btn-outline-info">
+                                {% if current_lang == 'ar' %}
                                     English
-                                </button>
-                                <button type="submit" 
-                                        name="lang" 
-                                        value="ar"
-                                        class="btn {% if current_lang == 'ar' %}btn-primary{% else %}btn-outline-primary{% endif %}"
-                                        {% if current_lang == 'ar' %}disabled{% endif %}>
+                                {% else %}
                                     العربية
-                                </button>
-                            </div>
+                                {% endif %}
+                            </button>
                         </form>
                     </div>
 

@@ -55,7 +55,15 @@ def fill_test(request, student_id):
             # getlist gets all selected values for each question
             answers[q_num] = ','.join(request.POST.getlist(q_num))
         
-        # If this is a final submission (not just language switch)
+        # If this is a language switch
+        if 'lang' in request.POST:
+            # Save answers to session for language switch
+            request.session[session_key] = answers
+            # Switch language
+            new_lang = 'ar' if request.POST.get('lang') == 'en' else 'en'
+            return redirect(f'{request.path}?lang={new_lang}')
+        
+        # If this is a final submission
         if 'submit_test' in request.POST:
             # Calculate VARK scores
             results = calculate_vark_scores(answers)
@@ -76,12 +84,6 @@ def fill_test(request, student_id):
                 del request.session[session_key]
             
             return redirect('learning_methods:results', student_id=student_id)
-        else:
-            # Save answers to session for language switch
-            request.session[session_key] = answers
-            # Redirect to same page with new language
-            new_lang = 'ar' if lang == 'en' else 'en'
-            return redirect(f'{request.path}?lang={new_lang}')
 
     context = {
         'questions': questions,
