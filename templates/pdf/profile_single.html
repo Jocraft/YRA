@@ -39,7 +39,8 @@
       <div class="dashboard-description">
         <p><strong>{% trans 'First Name:' %}</strong> {{ user.first_name|title }}</p>
         <p><strong>{% trans 'Last Name:' %}</strong> {{ user.last_name|title }}</p>
-        <p><strong>{% trans 'ID No.:' %}</strong> {{ user.id }}</p>
+        <p><strong>{% trans 'User name:' %}</strong> {{ student.student.username }}</p>
+        <p><strong>{% trans 'ID No.:' %}</strong> {{ student.id }}</p>
 
         <p><strong>{% trans 'Date of Birth:' %}</strong> {{ user.date_of_birth|date:"SHORT_DATE_FORMAT" }}</p>
         <p><strong>{% trans 'Nationality:' %}</strong> {{ user.nationality }}</p>
