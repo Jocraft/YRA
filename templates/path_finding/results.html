@@ -29,9 +29,8 @@
             </div>
             <div class="card-body">
                 <div class="analysis-result">
-                    {{ result|linebreaks }}
+                    {{ result|safe|linebreaks }}
                 </div>
             </div>
-        </div>
     </div>
     {% endblock %}

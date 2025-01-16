@@ -94,6 +94,27 @@ def analyze_answer(question, answer, programs):
         )
         
         response_text = response.text.strip()
+
+        # Set colors using theory principles
+        for program in programs:
+            response_text = response_text.replace(program.title, f"<span style='color: #DAA520;'>{program.title}</span>")  # Orange for program titles
+
+        # Apply large and bold yellow color to "Profile Analysis:" and "Program Recommendations:" sections
+        response_text = response_text.replace("Profile Analysis:", "<span style='color: #0DCAF0; font-size: 1.5em; font-weight: bold;'>Profile Analysis:</span>")  # Large, bold Yellow
+        response_text = response_text.replace("Program Recommendations:", "<span style='color: #0DCAF0; font-size: 1.5em; font-weight: bold;'>Program Recommendations:</span>")  # Large, bold Yellow
+
+        # Apply green color to sub-sections: "Most Suitable", "Suitable", and "Less Suitable"
+        response_text = response_text.replace("Most Suitable (Top matches):", "<span style='color: #90EE90;'>Most Suitable (Top matches):</span>")  # Lime Green
+        response_text = response_text.replace("Suitable (Next best options):", "<span style='color: #90EE90;'>Suitable (Next best options):</span>")  # Lime Green
+        response_text = response_text.replace("Less Suitable (Not recommended):", "<span style='color: #90EE90;'>Less Suitable (Not recommended):</span>")  # Lime Green
+
+        # Apply red color to the labels under "Profile Analysis"
+        response_text = response_text.replace("Primary Interests:", "<span style='color: #D87093;'>Primary Interests:</span>")  # Tomato Red
+        response_text = response_text.replace("Technical Aptitude:", "<span style='color: #D87093;'>Technical Aptitude:</span>")  # Tomato Red
+        response_text = response_text.replace("Communication Skills:", "<span style='color: #D87093;'>Communication Skills:</span>")  # Tomato Red
+        response_text = response_text.replace("Learning Preference:", "<span style='color: #D87093;'>Learning Preference:</span>")  # Tomato Red
+        response_text = response_text.replace("Career Direction:", "<span style='color: #D87093;'>Career Direction:</span>")  # Tomato Red
+
         if "Profile Analysis:" not in response_text or "Program Recommendations:" not in response_text:
             print(f"Invalid response format: {response_text}")
             program_list = list(programs)
