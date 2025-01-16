@@ -73,19 +73,6 @@
                         </div>
 
                         <hr>
-                        <h5 class="mb-3">{% trans 'Permissions' %}</h5>
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                {{ form.can_add_student|as_crispy_field }}
-                            </div>
-                            <div class="col-md-4">
-                                {{ form.can_view_students|as_crispy_field }}
-                            </div>
-                            <div class="col-md-4">
-                                {{ form.can_edit_students|as_crispy_field }}
-                            </div>
-                        </div>
-
                         <div class="row mb-4">
                             <div class="col-md-4">
                                 {{ form.can_analyze_data|as_crispy_field }}
