@@ -93,11 +93,11 @@
 
 <!-- Bulk Upload Log (if any) -->
 {% if bulk_upload_log %}
-  <div class="alert alert-info mb-4">
-    <h5 class="mb-1">Bulk Upload Log</h5>
+  <div class="alert alert-info mb-4" >
+    <h5 class="mb-1" style="color: black;">Bulk Upload Log</h5>
     <ul class="mb-0" style="color: black;">
       {% for line in bulk_upload_log %}
-        <li>{{ line }}</li>
+        <li style="color: black;">{{ line }}</li>
       {% endfor %}
     </ul>
   </div>
