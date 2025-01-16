@@ -11,7 +11,7 @@
             </td>
             <td class="info">
                 <p>{{ user.get_full_name|title }}</p>
-                <p><strong>{% trans 'Last login:' %}</strong> {{ user.last_login|date }}</p>
+                <p><strong>{% trans 'Program' %}: </strong>{{ student.program }}</p>
                 <p><strong>{% trans 'Role:' %}</strong> {{ user.get_user_role }}</p>
             </td>
         </tr>
@@ -39,7 +39,13 @@
       <div class="dashboard-description">
         <p><strong>{% trans 'First Name:' %}</strong> {{ user.first_name|title }}</p>
         <p><strong>{% trans 'Last Name:' %}</strong> {{ user.last_name|title }}</p>
-        <p><strong>{% trans 'ID No.:' %}</strong> {{ user.username }}</p>
+        <p><strong>{% trans 'ID No.:' %}</strong> {{ user.id }}</p>
+
+        <p><strong>{% trans 'Date of Birth:' %}</strong> {{ user.date_of_birth|date:"SHORT_DATE_FORMAT" }}</p>
+        <p><strong>{% trans 'Nationality:' %}</strong> {{ user.nationality }}</p>
+        <p><strong>{% trans 'Ethnicity:' %}</strong> {{ user.ethnicity }}</p>
+        <p><strong>{% trans 'Religion:' %}</strong> {{ user.religion }}</p>
+        <p><strong>{% trans 'Languages Spoken:' %}</strong> {{ user.languages_spoken }}</p>
       </div>
 
       {% if user.is_student %}
@@ -48,8 +54,6 @@
       <div class="dashboard-description">
         <p><strong>{% trans 'School:' %}</strong>{% trans 'Hawas Preparatory School' %}</p>
         <p><strong>{% trans 'Level:' %}</strong> {{ level.level }}</p>
-        <p><strong>{% trans 'ASSSS:' %}</strong> {{ level.level }}</p>
-
       </div>
       {% endif %}
 
@@ -64,11 +68,11 @@
       <hr>
       <p class="h5">{% trans 'Important Dates' %}</p>
       <div class="dashboard-description">
-        <p><strong>{% trans 'Last login:' %}</strong> {{ user.last_login }}</p>
         {% if current_semester and current_session %}
         <p><strong>{% trans 'Academic Year:' %}</strong> {{ current_semester }} {% trans 'Semester' %} {{ current_session }}</p>
         {% endif %}
         <p><strong>{% trans 'Registered Date:' %}</strong> {{ user.date_joined|date }}</p>
+        <p><strong>{% trans 'Expected Graduation Date:' %}</strong> {{ user.expected_graduation_date|date:"SHORT_DATE_FORMAT" }}</p>
       </div>
     </div>
   </div>
