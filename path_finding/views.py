@@ -2,14 +2,14 @@ import openpyxl
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
+from course.models import Program
+from .questions import QUESTIONS
+from .models import  TestAnswer
+from .models import TestSession, PathFindingLog
+
 
 # Models
 from accounts.models import Student
-from .models import TestSession, Program, PathFindingLog
-# (If your "Program" model is in "course.models", then import from there:
-# from course.models import Program
-# Adjust as needed.)
-
 from .questions import QUESTIONS, QUESTIONS_AR
 from .llm_analyzer import analyze_answer  # Assume you have a custom LLM logic
 
@@ -151,11 +151,12 @@ def fill_test_view(request, session_id):
 
 def generate_results_view(request, session_id):
     """
-    Analyzes the student's answers using LLM and recommends programs.
+    Analyzes the student's test answers using LLM and recommends programs
     """
     session = get_object_or_404(TestSession, pk=session_id)
     programs = Program.objects.all()
-
+    
+    # Map field names to question numbers
     field_mapping = {
         1: 'q1_numbers',
         2: 'q2_math',
@@ -168,40 +169,45 @@ def generate_results_view(request, session_id):
         9: 'q9_projects',
         10: 'q10_goals'
     }
-
-    # Collect Q&A
+    
+    # Format all answers for LLM analysis
     qa_pairs = []
     for i in range(1, 11):
         question = next((q for q in QUESTIONS if q['order'] == i), None)
         if question:
             field_name = field_mapping[i]
-            answer = getattr(session, field_name, "")
+            answer = getattr(session, field_name)
             qa_pairs.append({
                 'question': question['text'],
                 'answer': answer,
                 'question_id': i
             })
-
-    # Analyze with your LLM (pseudo-code)
+    
+    # Analyze answers
     if qa_pairs:
         answer_summary = "\n\n".join([
-            f"Question {qa['question_id']}: {qa['question']}\nStudent's Answer: {qa['answer']}"
+            f"Question {qa['question_id']}: {qa['question']}\n"
+            f"Student's Answer: {qa['answer']}"
             for qa in qa_pairs
         ])
+        
         result = analyze_answer(
-            question="Based on the student's answers, recommend suitable programs.",
+            question="Based on all the student's answers to the career assessment questions, recommend suitable programs.",
             answer=answer_summary,
             programs=programs
         )
+        
+        # Store the LLM analysis result
         session.llm_analysis = result
         session.save()
     else:
         result = "No answers found to analyze."
-
+    
     return render(request, 'path_finding/results.html', {
         'session': session,
         'qa_pairs': qa_pairs,
-        'result': result
+        'result': result,
+        "programs": programs
     })
 
 

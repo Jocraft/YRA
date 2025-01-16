@@ -13,13 +13,11 @@ from xhtml2pdf import pisa
 from accounts.decorators import admin_required
 from accounts.filters import LecturerFilter, StudentFilter
 from accounts.forms import (
-    ParentAddForm,
     ProfileUpdateForm,
     ProgramUpdateForm,
-    StaffAddForm,
     StudentAddForm,
 )
-from accounts.models import Parent, Student, User
+from accounts.models import  Student, User
 from core.models import Semester, Session
 from course.models import Course
 # from course.models import TakenCourse  # If you have a TakenCourse model
@@ -78,12 +76,10 @@ def profile(request):
 
     if request.user.is_student:
         student = get_object_or_404(Student, student__pk=request.user.id)
-        parent = Parent.objects.filter(student=student).first()
         # If you have a TakenCourse model, you can fetch courses here
         courses = []
         context.update(
             {
-                "parent": parent,
                 "courses": courses,
                 "level": student.level,
             }
@@ -178,85 +174,6 @@ def change_password(request):
         form = PasswordChangeForm(request.user)
     return render(request, "setting/password_change.html", {"form": form})
 
-
-@login_required
-@admin_required
-def staff_add_view(request):
-    if request.method == "POST":
-        form = StaffAddForm(request.POST)
-        if form.is_valid():
-            lecturer = form.save()
-            full_name = lecturer.get_full_name
-            email = lecturer.email
-            messages.success(
-                request,
-                f"Account for lecturer {full_name} has been created. "
-                f"An email with account credentials will be sent to {email} within a minute.",
-            )
-            return redirect("lecturer_list")
-    else:
-        form = StaffAddForm()
-    return render(
-        request, "accounts/add_staff.html", {"title": "Add Lecturer", "form": form}
-    )
-
-
-@login_required
-@admin_required
-def edit_staff(request, pk):
-    lecturer = get_object_or_404(User, is_lecturer=True, pk=pk)
-    if request.method == "POST":
-        form = ProfileUpdateForm(request.POST, request.FILES, instance=lecturer)
-        if form.is_valid():
-            form.save()
-            full_name = lecturer.get_full_name
-            messages.success(request, f"Lecturer {full_name} has been updated.")
-            return redirect("lecturer_list")
-        messages.error(request, "Please correct the error below.")
-    else:
-        form = ProfileUpdateForm(instance=lecturer)
-    return render(
-        request, "accounts/edit_lecturer.html", {"title": "Edit Lecturer", "form": form}
-    )
-
-
-@method_decorator([login_required, admin_required], name="dispatch")
-class LecturerFilterView(FilterView):
-    filterset_class = LecturerFilter
-    queryset = User.objects.filter(is_lecturer=True)
-    template_name = "accounts/lecturer_list.html"
-    paginate_by = 10
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = "Lecturers"
-        return context
-
-
-@login_required
-@admin_required
-def render_lecturer_pdf_list(request):
-    lecturers = User.objects.filter(is_lecturer=True)
-    template_path = "pdf/lecturer_list.html"
-    context = {"lecturers": lecturers}
-    response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = 'filename="lecturers_list.pdf"'
-    template = get_template(template_path)
-    html = template.render(context)
-    pisa_status = pisa.CreatePDF(html, dest=response)
-    if pisa_status.err:
-        return HttpResponse(f"We had some errors <pre>{html}</pre>")
-    return response
-
-
-@login_required
-@admin_required
-def delete_staff(request, pk):
-    lecturer = get_object_or_404(User, is_lecturer=True, pk=pk)
-    full_name = lecturer.get_full_name
-    lecturer.delete()
-    messages.success(request, f"Lecturer {full_name} has been deleted.")
-    return redirect("lecturer_list")
 
 
 # -------------------------
@@ -383,12 +300,3 @@ def edit_student_program(request, pk):
     )
 
 
-@method_decorator([login_required, admin_required], name="dispatch")
-class ParentAdd(CreateView):
-    model = Parent
-    form_class = ParentAddForm
-    template_name = "accounts/parent_form.html"
-
-    def form_valid(self, form):
-        messages.success(self.request, "Parent added successfully.")
-        return super().form_valid(form)

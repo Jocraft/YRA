@@ -9,7 +9,6 @@ from course.models import Program
 from .models import (
     User,
     Student,
-    Parent,
     RELATION_SHIP,
     LEVEL,
     GENDERS,
@@ -669,10 +668,4 @@ class ParentAddForm(UserCreationForm):
         user.phone = self.cleaned_data.get("phone")
         user.email = self.cleaned_data.get("email")
         user.save()
-        parent = Parent.objects.create(
-            user=user,
-            student=self.cleaned_data.get("student"),
-            relation_ship=self.cleaned_data.get("relation_ship"),
-        )
-        parent.save()
         return user

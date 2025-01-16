@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} | {% trans 'Youth Road Analyzer' %}{% endblock title %}
+
+{% block content %}
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">{% trans 'Home' %}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'admin_panel' %}">{% trans 'Admin Panel' %}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{% trans 'User Management' %}</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="title-1">
+        <i class="fas fa-users"></i> {% trans 'User Management' %}
+    </div>
+    <a href="{% url 'add_user' %}" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i> {% trans 'Add New User' %}
+    </a>
+</div>
+
+{% include 'snippets/messages.html' %}
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Username' %}</th>
+                        <th>{% trans 'Full Name' %}</th>
+                        <th>{% trans 'Email' %}</th>
+                        <th>{% trans 'Roles' %}</th>
+                        <th>{% trans 'Permissions' %}</th>
+                        <th>{% trans 'Actions' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.get_full_name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% if user.is_staff %}<span class="badge bg-info">{% trans 'Staff' %}</span>{% endif %}
+                            {% if user.is_lecturer %}<span class="badge bg-primary">{% trans 'Lecturer' %}</span>{% endif %}
+                            {% if user.is_student %}<span class="badge bg-success">{% trans 'Student' %}</span>{% endif %}
+                            {% if user.is_parent %}<span class="badge bg-warning">{% trans 'Parent' %}</span>{% endif %}
+                        </td>
+                        <td>
+                            {% if user.can_add_student %}<span class="badge bg-secondary">{% trans 'Add Students' %}</span>{% endif %}
+                            {% if user.can_view_students %}<span class="badge bg-secondary">{% trans 'View Students' %}</span>{% endif %}
+                            {% if user.can_edit_students %}<span class="badge bg-secondary">{% trans 'Edit Students' %}</span>{% endif %}
+                            {% if user.can_analyze_data %}<span class="badge bg-secondary">{% trans 'Data Analysis' %}</span>{% endif %}
+                            {% if user.can_use_path_finding %}<span class="badge bg-secondary">{% trans 'Path Finding' %}</span>{% endif %}
+                            {% if user.can_use_learning_method %}<span class="badge bg-secondary">{% trans 'Learning Method' %}</span>{% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'edit_user' user.pk %}" class="btn btn-sm btn-warning" title="{% trans 'Edit' %}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" 
+                                        data-bs-target="#deleteModal{{ user.pk }}" title="{% trans 'Delete' %}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+
+                            <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteModal{{ user.pk }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">{% trans 'Confirm Delete' %}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            {% blocktrans with username=user.username %}
+                                            Are you sure you want to delete user "{{ username }}"? This action cannot be undone.
+                                            {% endblocktrans %}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                {% trans 'Cancel' %}
+                                            </button>
+                                            <a href="{% url 'delete_user' user.pk %}" class="btn btn-danger">
+                                                {% trans 'Delete' %}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">{% trans 'No users found.' %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if is_paginated %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

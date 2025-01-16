@@ -376,33 +376,3 @@ class Student(models.Model):
         self.student.delete()
         super().delete(*args, **kwargs)
     
-class Parent(models.Model):
-    """
-    Connect student with their parent, parents can
-    only view their connected student's information
-    """
-
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    student = models.OneToOneField(Student, null=True, on_delete=models.SET_NULL)
-    first_name = models.CharField(max_length=120)
-    last_name = models.CharField(max_length=120)
-    phone = models.CharField(max_length=60, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
-    relation_ship = models.TextField(choices=RELATION_SHIP, blank=True)
-
-    class Meta:
-        ordering = ("-user__date_joined",)
-
-    def __str__(self):
-        return self.user.username
-
-
-class DepartmentHead(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    department = models.ForeignKey(Program, on_delete=models.CASCADE, null=True)
-
-    class Meta:
-        ordering = ("-user__date_joined",)
-
-    def __str__(self):
-        return "{}".format(self.user)
