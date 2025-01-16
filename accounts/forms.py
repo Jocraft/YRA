@@ -358,11 +358,14 @@ class StudentAddForm(UserCreationForm):
 
         if commit:
             user.save()
-            # Create the linked Student record
-            Student.objects.create(
+
+            # Update or create Student object
+            student, created = Student.objects.update_or_create(
                 student=user,
-                level=self.cleaned_data.get("level"),
-                program=self.cleaned_data.get("program"),
+                defaults={
+                    "level": self.cleaned_data.get("level"),
+                    "program": self.cleaned_data.get("program"),
+                },
             )
         return user
 
@@ -488,6 +491,22 @@ class ProfileUpdateForm(UserChangeForm):
         widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
         label="Date of Birth",
     )
+    level = forms.CharField(
+        widget=forms.Select(
+            choices=LEVEL,
+            attrs={"class": "browser-default custom-select form-control"},
+        ),
+        required=False,
+        label="Level",
+    )
+    program = forms.ModelChoiceField(
+        queryset=Program.objects.all(),
+        widget=forms.Select(
+            attrs={"class": "browser-default custom-select form-control"}
+        ),
+        required=False,
+        label="Program",
+    )
 
     class Meta:
         model = User
@@ -514,6 +533,9 @@ class ProfileUpdateForm(UserChangeForm):
         Pre-fill the languages_spoken multiple-choice from the comma-separated string in the DB.
         """
         super().__init__(*args, **kwargs)
+        if hasattr(self.instance, 'student'):  # Check if the user has a related Student object
+            student = self.instance.student
+            self.fields["program"].initial = student.program  # Set the initial program value
         if self.instance.languages_spoken:
             lang_list = self.instance.languages_spoken.split(",")
             self.fields["languages_spoken"].initial = lang_list
@@ -521,20 +543,25 @@ class ProfileUpdateForm(UserChangeForm):
     def save(self, commit=True):
         user = super().save(commit=False)
 
-        # Convert multiple choice (list) back into a comma string
+        # Save user fields
         selected_langs = self.cleaned_data.get("languages_spoken", [])
         user.languages_spoken = ",".join(selected_langs)
-
-        # Make sure faculty is saved
         user.faculty = self.cleaned_data.get("faculty")
-
-        # Save date_of_birth
         user.date_of_birth = self.cleaned_data.get("date_of_birth")
 
         if commit:
             user.save()
-        return user
 
+            # Update related Student object
+            if hasattr(user, "student"):
+                Student.objects.update_or_create(
+                    student=user,
+                    defaults={
+                        "level": self.cleaned_data.get("level"),
+                        "program": self.cleaned_data.get("program"),
+                    },
+                )
+        return user
 
 class ProgramUpdateForm(UserChangeForm):
     program = forms.ModelChoiceField(

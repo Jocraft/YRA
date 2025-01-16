@@ -32,6 +32,8 @@
           {{ form.phone|as_crispy_field }}
           {{ form.address|as_crispy_field }}
           {{ form.date_of_birth|as_crispy_field }}
+          {{ form.enrollment_date|as_crispy_field }}
+
 
         </div>
       </div>
@@ -54,9 +56,10 @@
       <div class="card">
         <p class="form-title">{% trans 'Others' %}</p>
         <div class="card-body">
-            <p><strong>{% trans 'Program' %}:</strong> {{ student_program }}</p>
-            <p><strong>{% trans 'Level' %}:</strong> {{ student_level }}</p>
-            <p><strong>{% trans 'Faculty' %}:</strong> {{ student_faculty }}</p>
+            {{ form.program|as_crispy_field }}
+            {{ form.level|as_crispy_field }}
+            {{ form.faculty|as_crispy_field }}
+
         
           {{ form.picture|as_crispy_field }}
         </div>

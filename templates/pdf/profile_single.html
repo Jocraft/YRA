@@ -53,8 +53,9 @@
       <hr>
       <p class="h5">{% trans 'Applicant Info' %}</p>
       <div class="dashboard-description">
-        <p><strong>{% trans 'School:' %}</strong>{% trans 'Hawas Preparatory School' %}</p>
-        <p><strong>{% trans 'Level:' %}</strong> {{ level.level }}</p>
+        <p><strong>{% trans 'Level:' %}</strong> {{ student.level }}</p>
+        <p><strong>{% trans 'Facylty:' %}</strong> {{ user.faculty }}</p>
+        <p><strong>{% trans 'Program' %}: </strong>{{ student.program }}</p>
       </div>
       {% endif %}
 
