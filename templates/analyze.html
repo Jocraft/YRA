@@ -46,27 +46,35 @@
     {% endif %}
 
     {% if statistics and analysis_type != 'hypothesis' %}
-      <div class="analysis-section analysis-statistics-section">
-        <h2 class="analysis-subtitle">Statistics for Selected Column</h2>
-        <ul class="analysis-statistics-list">
-          {% for key, value in statistics.items %}
-            <li>
-              <strong>{{ key }}</strong>:
-              {% if value|length > 1 and value.items %}
-                <ul class="analysis-sublist">
-                  {% for sub_key, sub_value in value.items %}
-                    <li>{{ sub_key }}: {{ sub_value }}</li>
-                  {% endfor %}
-                </ul>
-              {% else %}
-                {{ value }}
-              {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% endif %}
-
+    <div class="analysis-section analysis-statistics-section">
+      <h2 class="analysis-subtitle">Statistics for Selected Column</h2>
+      <ul class="analysis-statistics-list">
+        {% for key, value in statistics.items %}
+          <li>
+            <strong>{{ key }}</strong>:
+            {% if key == 'Grouped Category Counts' %}
+              <ul class="analysis-sublist">
+                {% for group, counts in value.items %}
+                  <li>
+                    <strong>{{ group }}</strong>: {{ counts|safe }}
+                  </li>
+                {% endfor %}
+              </ul>
+            {% elif value|length > 1 and value.items %}
+              <ul class="analysis-sublist">
+                {% for sub_key, sub_value in value.items %}
+                  <li>{{ sub_key }}: {{ sub_value }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              {{ value }}
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+  
     {% if column_values and analysis_type != 'hypothesis' %}
     {% endif %}
   </div>

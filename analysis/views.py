@@ -425,12 +425,35 @@ def analyze(request):
                         grouped = df.groupby('group_by')['column'].value_counts().unstack(fill_value=0)
                         fig = px.bar(grouped, barmode='stack',
                                    title=f"Distribution of {column} by {group_by}")
-                        statistics = grouped.to_dict()
+                        category_mode = grouped.idxmax(axis=1)  
+                        statistics = {
+                                    'Category Mode': category_mode.to_dict(),
+                                    'Grouped Category Counts': {
+                                        group: "<br>&nbsp;&nbsp;&nbsp;&nbsp;".join([f"{category}={count}" for category, count in counts.items()])
+
+                                        for group, counts in grouped.to_dict().items()
+                                    },}
+
                     else:
                         counts = df['column'].value_counts()
                         fig = px.bar(x=counts.index, y=counts.values,
                                    title=f"Distribution of {column}")
-                        statistics = {'Counts': counts.to_dict()}
+                        category_mode = counts.idxmax()
+                        total_count = counts.sum()
+                        category_percentages = {category: f"{(count / total_count * 100):.2f}%" for category, count in counts.items()}
+                        min_count = counts.min()  # Minimum count
+                        max_count = counts.max()  # Maximum count
+                        std_dev = counts.std()  # Standard deviation of category counts
+
+                        statistics = {
+                                'Most Frequent Category': category_mode,
+                                'Counts': counts.to_dict(),
+                                'Category Percentages': category_percentages,  # Percent distribution
+                                'Minimum Count': min_count,  # Minimum category count
+                                'Maximum Count': max_count,  # Maximum category count
+                                'Standard Deviation': std_dev, 
+                            }
+                        
 
                 plot_html = fig.to_html(full_html=False)
 
