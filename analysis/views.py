@@ -348,7 +348,6 @@ def analyze(request):
 
                                 statistics = {
                                     'Year Statistics': {
-                                        'Total Count': len(df),
                                         'Most Common Month': month_names[most_common_month_idx],
                                         'Highest Count (Month)': monthly_counts.max(),
                                         'Average Monthly Count': f"{monthly_counts.mean():.1f}",
