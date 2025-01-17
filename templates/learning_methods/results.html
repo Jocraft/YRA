@@ -103,37 +103,64 @@
                                         <li class="mb-2">Learns better through observing patterns and relationships.</li>
                                         <li class="mb-2">Struggles with dense blocks of text without visuals.</li>
                                     </ul>
+                                    <h5 class="text-warning mt-4">Effective Learning Tools:</h5>
+                                    <ul class="text-light">
+                                        <li class="mb-2">PowerPoint presentations with diagrams and images.</li>
+                                        <li class="mb-2">Concept mapping and visual flowcharts.</li>
+                                        <li class="mb-2">Highlighted or color-coded notes.</li>
+                                    </ul>
                                 {% elif style == 'A' %}
-                                    <h4 class="text-info">Aural (A)</h4>
-                                    <h5 class="text-warning mt-4">Features:</h5>
-                                    <ul class="text-light">
-                                        <li class="mb-2">Prefers listening to spoken information (lectures, discussions, audio recordings).</li>
-                                        <li class="mb-2">Enjoys group discussions or debates to clarify concepts.</li>
-                                        <li class="mb-2">Learns well by repeating ideas aloud or discussing them with others.</li>
-                                        <li class="mb-2">Can recall information from tone, rhythm, or voice inflections.</li>
-                                        <li class="mb-2">May prefer reading text aloud or using mnemonic devices.</li>
-                                    </ul>
-                                {% elif style == 'R' %}
-                                    <h4 class="text-info">Read/Write (R)</h4>
-                                    <h5 class="text-warning mt-4">Features:</h5>
-                                    <ul class="text-light">
-                                        <li class="mb-2">Prefers absorbing information through reading and creating text-based materials.</li>
-                                        <li class="mb-2">Takes detailed written notes during lectures.</li>
-                                        <li class="mb-2">Learns effectively by writing summaries, essays, or lists.</li>
-                                        <li class="mb-2">Enjoys reading and referencing books, articles, or printed materials.</li>
-                                        <li class="mb-2">Struggles with unstructured or overly visual content.</li>
-                                    </ul>
-                                {% elif style == 'K' %}
-                                    <h4 class="text-info">Kinesthetic (K)</h4>
-                                    <h5 class="text-warning mt-4">Features:</h5>
-                                    <ul class="text-light">
-                                        <li class="mb-2">Prefers hands-on learning through direct experience and practice.</li>
-                                        <li class="mb-2">Thrives on real-world examples, demonstrations, and simulations.</li>
-                                        <li class="mb-2">Learns better by "doing" rather than observing or listening.</li>
-                                        <li class="mb-2">Engages well in lab work, role-playing, or physical activities.</li>
-                                        <li class="mb-2">Finds it easier to remember information connected to actions or physical sensations.</li>
-                                    </ul>
-                                {% elif style == 'VA' %}
+                                <h4 class="text-info">Aural (A)</h4>
+                                <h5 class="text-warning mt-4">Features:</h5>
+                                <ul class="text-light">
+                                    <li class="mb-2">Prefers listening to spoken information (lectures, discussions, audio recordings).</li>
+                                    <li class="mb-2">Enjoys group discussions or debates to clarify concepts.</li>
+                                    <li class="mb-2">Learns well by repeating ideas aloud or discussing them with others.</li>
+                                    <li class="mb-2">Can recall information from tone, rhythm, or voice inflections.</li>
+                                    <li class="mb-2">May prefer reading text aloud or using mnemonic devices.</li>
+                                </ul>
+                                <h5 class="text-warning mt-4">Effective Learning Tools:</h5>
+                                <ul class="text-light">
+                                    <li class="mb-2">Podcasts, audiobooks, and recorded lectures.</li>
+                                    <li class="mb-2">Group discussions or study groups.</li>
+                                    <li class="mb-2">Text-to-speech software.</li>
+                                    <li class="mb-2">Oral quizzes or verbal summaries.</li>
+                                </ul>
+                            {% elif style == 'R' %}
+                            <h4 class="text-info">Read/Write (R)</h4>
+                            <h5 class="text-warning mt-4">Features:</h5>
+                            <ul class="text-light">
+                                <li class="mb-2">Prefers absorbing information through reading and creating text-based materials.</li>
+                                <li class="mb-2">Takes detailed written notes during lectures.</li>
+                                <li class="mb-2">Learns effectively by writing summaries, essays, or lists.</li>
+                                <li class="mb-2">Enjoys reading and referencing books, articles, or printed materials.</li>
+                                <li class="mb-2">Struggles with unstructured or overly visual content.</li>
+                            </ul>
+                            <h5 class="text-warning mt-4">Effective Learning Tools:</h5>
+                            <ul class="text-light">
+                                <li class="mb-2">Written instructions and detailed handouts.</li>
+                                <li class="mb-2">Flashcards with text-based cues.</li>
+                                <li class="mb-2">Books, journals, and online articles.</li>
+                                <li class="mb-2">Writing summaries or structured outlines.</li>
+                            </ul>
+                        {% elif style == 'K' %}
+                            <h4 class="text-info">Kinesthetic (K)</h4>
+                            <h5 class="text-warning mt-4">Features:</h5>
+                            <ul class="text-light">
+                                <li class="mb-2">Prefers hands-on learning through direct experience and practice.</li>
+                                <li class="mb-2">Thrives on real-world examples, demonstrations, and simulations.</li>
+                                <li class="mb-2">Learns better by "doing" rather than observing or listening.</li>
+                                <li class="mb-2">Engages well in lab work, role-playing, or physical activities.</li>
+                                <li class="mb-2">Finds it easier to remember information connected to actions or physical sensations.</li>
+                            </ul>
+                            <h5 class="text-warning mt-4">Effective Learning Tools:</h5>
+                            <ul class="text-light">
+                                <li class="mb-2">Labs, experiments, and field trips.</li>
+                                <li class="mb-2">Case studies or real-life problem-solving exercises.</li>
+                                <li class="mb-2">Building models, manipulating objects, or creating prototypes.</li>
+                                <li class="mb-2">Physical simulations or interactive activities.</li>
+                            </ul>
+                    {% elif style == 'VA' %}
                                     <h4 class="text-info">Visual-Aural (VA)</h4>
                                     <h5 class="text-warning mt-4">Features:</h5>
                                     <ul class="text-light">
@@ -143,6 +170,15 @@
                                         <li class="mb-2">Enjoys visual demonstrations with verbal explanations.</li>
                                         <li class="mb-2">Effective at combining visual note-taking with verbal discussions.</li>
                                     </ul>
+                                    <h5 class="text-warning mt-4">Effective Learning Tools:</h5>
+                                    <ul class="text-light">
+                                        <li class="mb-2">Videos and animations with spoken narration.</li>
+                                        <li class="mb-2">Interactive multimedia presentations.</li>
+                                        <li class="mb-2">Podcasts or audiobooks paired with visual handouts or slides.</li>
+                                        <li class="mb-2">Group discussions using visual aids like charts and graphs.</li>
+                                        <li class="mb-2">Apps and tools combining audio instructions with visual elements.</li>
+                                    </ul>
+
                                 {% elif style == 'RK' %}
                                     <h4 class="text-info">Read/Write-Kinesthetic (RK)</h4>
                                     <h5 class="text-warning mt-4">Features:</h5>
@@ -153,6 +189,15 @@
                                         <li class="mb-2">Enjoys interactive learning with written components.</li>
                                         <li class="mb-2">Effective at applying theoretical knowledge to practical situations.</li>
                                     </ul>
+                                    <h5 class="text-warning mt-4">Effective Learning Tools:</h5>
+                                    <ul class="text-light">
+                                        <li class="mb-2">Detailed step-by-step guides for hands-on tasks.</li>
+                                        <li class="mb-2">Writing reflections or documenting practical experiments.</li>
+                                        <li class="mb-2">Interactive exercises with written instructions and physical components.</li>
+                                        <li class="mb-2">Simulations or case studies with opportunities to record observations.</li>
+                                        <li class="mb-2">Combining text-heavy materials with physical models or demonstrations.</li>
+                                    </ul>
+
                                 {% elif style == 'S' %}
                                     <h4 class="text-info">Special Class (S)</h4>
                                     <h5 class="text-warning mt-4">Features:</h5>
@@ -163,6 +208,15 @@
                                         <li class="mb-2">Benefits from varied and mixed learning approaches.</li>
                                         <li class="mb-2">Versatile learner who can engage with content in multiple ways.</li>
                                     </ul>
+                                    <h5 class="text-warning mt-4">Effective Learning Tools:</h5>
+                                    <ul class="text-light">
+                                        <li class="mb-2">Blended learning techniques incorporating visual, auditory, and hands-on approaches.</li>
+                                        <li class="mb-2">Adaptive learning platforms that cater to multiple styles.</li>
+                                        <li class="mb-2">Collaborative projects that allow exploration through various methods.</li>
+                                        <li class="mb-2">Workshops or lessons integrating multimedia tools and hands-on tasks.</li>
+                                        <li class="mb-2">Customized study plans with diverse resources (videos, books, experiments).</li>
+                                    </ul>
+
                                 {% endif %}
                             </div>
                         {% endfor %}

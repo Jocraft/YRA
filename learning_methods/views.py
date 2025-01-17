@@ -148,7 +148,7 @@ def results(request, student_id):
             if conditions_met >= 2:
                 combined_groups['S'] = sum(percentages.values()) / 4  # Average of all scores
                 # Make Special class slightly more attractive by boosting its score
-                combined_groups['S'] *= 1.1  # 10% boost to encourage Special classification
+                combined_groups['S'] *= 1.05  # 10% boost to encourage Special classification
     
     # Determine dominant styles based on group count
     if group_count == '4':
