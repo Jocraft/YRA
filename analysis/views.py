@@ -353,10 +353,10 @@ def analyze(request):
                                         'Average Monthly Count': f"{monthly_counts.mean():.1f}",
                                         'Month with Lowest Count': month_names[monthly_counts.idxmin() - 1],  # Corrected indexing
                                         'Lowest Count (Month)': monthly_counts.min(),
-                                        'Most Common Day': most_common_day_name,  # Using the corrected day name
+                                        'Most Common Day': most_common_day_name, 
                                         'Highest Count (Day)': day_of_week_counts.max(),
-                                        'Average Day Count': f"{day_of_week_counts.mean():.1f}",
-                                        'Day with Lowest Count': lowest_count_day_name,  # Using the corrected day name
+                                        'Average Day Count (for the whole year in week days)': f"{day_of_week_counts.mean():.1f}",
+                                        'Day with Lowest Count': lowest_count_day_name,  
                                         'Lowest Count (Day)': day_of_week_counts.min()
                                     }
                                 }
