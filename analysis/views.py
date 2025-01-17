@@ -185,13 +185,25 @@ def analyze(request):
                         df = df.sort_values('date')
                         
                         if selected_year:
-                            # Single bar plot for selected year
+                            # Add month and day of week columns
                             df['month'] = df['date'].dt.month
-                            month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-                            
+                            df['day_of_week'] = df['date'].dt.day_name()
+
+                            # Month names and day order starting from Saturday
+                            month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                            day_order = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+
+                            # Month distribution
+                            monthly_counts = df['month'].value_counts().reindex(range(1, 13), fill_value=0)
+                            monthly_counts.index = month_names
+
+                            # Day of the week distribution
+                            df['day_of_week'] = pd.Categorical(df['day_of_week'], categories=day_order, ordered=True)
+                            day_of_week_counts = df['day_of_week'].value_counts().reindex(day_order, fill_value=0)
+
+                        # Create a pivot table for grouped monthly and day of the week data if 'group_by' is present
                             if 'group_by' in df.columns:
-                                # Create pivot table for grouped monthly data
+                                # Pivot table for monthly grouped data
                                 monthly_grouped = pd.pivot_table(
                                     df,
                                     values='date',
@@ -200,83 +212,156 @@ def analyze(request):
                                     aggfunc='count',
                                     fill_value=0
                                 ).reindex(range(1, 13), fill_value=0)
-                                
-                                # Rename index with month names
-                                monthly_grouped.index = month_names
-                                
-                                fig = go.Figure()
-                                
-                                # Add bars for each group
+
+                                # Pivot table for day of the week grouped data
+                                day_of_week_grouped = pd.pivot_table(
+                                    df,
+                                    values='date',
+                                    index='day_of_week',
+                                    columns='group_by',
+                                    aggfunc='count',
+                                    fill_value=0
+                                ).reindex(day_order, fill_value=0)
+
+                                fig = make_subplots(
+                                    rows=1, cols=1, 
+                                    subplot_titles=["Day of Week and Month Distribution"],
+                                    vertical_spacing=0.1
+                                )
+
+                                # Add bars for each group in the monthly distribution
                                 for group in monthly_grouped.columns:
                                     fig.add_trace(go.Bar(
-                                        name=str(group),
+                                        name=f"Month: {group}",
                                         x=month_names,
                                         y=monthly_grouped[group],
                                         text=monthly_grouped[group],
-                                        textposition='auto'
+                                        textposition='auto',
+                                        hovertemplate='%{x}: %{y} counts'
                                     ))
-                                
+
+                                # Add bars for each group in the day of the week distribution
+                                for group in day_of_week_grouped.columns:
+                                    fig.add_trace(go.Bar(
+                                        name=f"Day of Week: {group}",
+                                        x=day_of_week_grouped.index,
+                                        y=day_of_week_grouped[group],
+                                        text=day_of_week_grouped[group],
+                                        textposition='auto',
+                                        hovertemplate='%{x}: %{y} counts'
+                                    ))
+
                                 fig.update_layout(
-                                    title_text=f"Monthly Distribution for {column} by {group_by} in {selected_year}",
-                                    xaxis_title="Month",
-                                    yaxis_title="Count",
+                                    title_text=f"Day of Week and Month Distribution for {column} by {group_by} in {selected_year}",
                                     height=500,
-                                    barmode='group',
+                                    barmode='stack',
                                     bargap=0.2,
                                     showlegend=True
                                 )
-                                
-                                # Update statistics for grouped data
+
+                                # Update axes labels
+                                fig.update_xaxes(title_text="Time Period (Month/Day of Week)")
+                                fig.update_yaxes(title_text="Count")
+
                                 statistics = {
                                     'Year Statistics': {
                                         'Total Count': len(df),
-                                        'Group Totals': monthly_grouped.sum().to_dict(),
+                                        'Group Totals (Month)': monthly_grouped.sum().to_dict(),
+                                        'Group Totals (Day of Week)': day_of_week_grouped.sum().to_dict(),
                                         'Most Common Month by Group': {
                                             str(group): month_names[monthly_grouped[group].argmax()]
                                             for group in monthly_grouped.columns
+                                        },
+                                        'Most Common Day by Group': {
+                                            str(group): day_order[day_of_week_grouped[group].argmax()]
+                                            for group in day_of_week_grouped.columns
                                         }
                                     }
                                 }
+
                             
                             else:
-                                # Original single group visualization
-                                monthly_counts = df['month'].value_counts().sort_index()
-                                
-                                # Create a complete series with all months (1-12)
-                                all_months = pd.Series(0, index=range(1, 13))
-                                # Update with actual counts
-                                all_months.update(monthly_counts)
-                                # Sort to ensure months are in order
-                                monthly_counts = all_months.sort_index()
-                                
-                                fig = go.Figure()
+                                # Calculate the monthly distribution with a default value of 0 for missing months
+                                monthly_counts = df['month'].value_counts().reindex(range(1, 13), fill_value=0)
+
+                                # Map month numbers to month names
+                                month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+                                # Calculate the day-of-week distribution
+                                df['day_of_week'] = df['date'].dt.day_name()
+                                day_order = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+                                df['day_of_week'] = pd.Categorical(df['day_of_week'], categories=day_order, ordered=True)
+                                day_of_week_counts = df['day_of_week'].value_counts().reindex(day_order, fill_value=0)
+
+                                # Create the plot
+                                fig = make_subplots(
+                                    rows=1, cols=2, 
+                                    subplot_titles=("Monthly Distribution", "Day of the Week Distribution"),
+                                    vertical_spacing=0.1
+                                )
+
+                                # Monthly Distribution Plot
                                 fig.add_trace(go.Bar(
                                     x=month_names,
                                     y=monthly_counts.values,
-                                    name='Count',
+                                    name='Monthly Count',
                                     text=monthly_counts.values,
-                                    textposition='auto'
-                                ))
-                                
+                                    textposition='auto',
+                                    hovertemplate='%{x}: %{y} counts'
+                                ), row=1, col=1)
+
+                                # Day of the Week Distribution Plot
+                                fig.add_trace(go.Bar(
+                                    x=day_order,
+                                    y=day_of_week_counts.values,
+                                    name='Day of the Week Count',
+                                    text=day_of_week_counts.values,
+                                    textposition='auto',
+                                    hovertemplate='%{x}: %{y} counts'
+                                ), row=1, col=2)
+
+                                # Update layout for better visualization
                                 fig.update_layout(
-                                    title_text=f"Monthly Distribution for {column} in {selected_year}",
-                                    xaxis_title="Month",
-                                    yaxis_title="Count",
+                                    title_text=f"Monthly and Day-of-Week Distribution for {column} in {selected_year}",
                                     height=500,
                                     showlegend=False,
-                                    bargap=0.2
+                                    barmode='stack',
+                                    bargap=0.2,
+                                    title_x=0.5
                                 )
-                                
-                                # Update statistics to use the complete monthly counts
-                                max_month_idx = monthly_counts.idxmax() - 1  # Convert to 0-based index
+
+                                # Update x and y axes for both plots
+                                fig.update_xaxes(title_text="Month", row=1, col=1)
+                                fig.update_yaxes(title_text="Count", row=1, col=1)
+                                fig.update_xaxes(title_text="Day of the Week", row=1, col=2)
+                                fig.update_yaxes(title_text="Count", row=1, col=2)
+
+                                # Update statistics with additional metrics
+                                most_common_month_idx = monthly_counts.idxmax() - 1  # Adjust index for 0-based indexing
+                                most_common_day_idx = day_of_week_counts.idxmax()  # No need for adjustment, already 0-based
+                                most_common_day_idx = day_of_week_counts.idxmax()  # Get the most common day directly
+                                most_common_day_name = day_order[day_order.index(most_common_day_idx)]  # Find the name from the day_order list
+
+                                # Find the day with the lowest count
+                                lowest_count_day_idx = day_of_week_counts.idxmin()  # Get the day with the lowest count directly
+                                lowest_count_day_name = day_order[day_order.index(lowest_count_day_idx)]  # Find the name from the day_order list
+
                                 statistics = {
                                     'Year Statistics': {
                                         'Total Count': len(df),
-                                        'Most Common Month': month_names[max_month_idx],
-                                        'Highest Count': monthly_counts.max(),
-                                        'Average Monthly Count': f"{monthly_counts.mean():.1f}"
+                                        'Most Common Month': month_names[most_common_month_idx],
+                                        'Highest Count (Month)': monthly_counts.max(),
+                                        'Average Monthly Count': f"{monthly_counts.mean():.1f}",
+                                        'Month with Lowest Count': month_names[monthly_counts.idxmin() - 1],  # Corrected indexing
+                                        'Lowest Count (Month)': monthly_counts.min(),
+                                        'Most Common Day': most_common_day_name,  # Using the corrected day name
+                                        'Highest Count (Day)': day_of_week_counts.max(),
+                                        'Average Day Count': f"{day_of_week_counts.mean():.1f}",
+                                        'Day with Lowest Count': lowest_count_day_name,  # Using the corrected day name
+                                        'Lowest Count (Day)': day_of_week_counts.min()
                                     }
                                 }
+
                         else:
                             # Original four plots for all years
                             fig = make_subplots(rows=2, cols=2,
@@ -317,6 +402,11 @@ def analyze(request):
                             fig.update_yaxes(title_text="Count", row=2, col=1)
                             fig.update_xaxes(title_text="Date", row=2, col=2)
                             fig.update_yaxes(title_text="Cumulative Count", row=2, col=2)
+                            most_common_year = yearly_counts.idxmax()
+                            most_common_month = monthly_counts.idxmax() 
+                            month_to_season = { 1: 'Winter', 2: 'Winter', 3: 'Spring', 4: 'Spring', 5: 'Spring', 6: 'Summer', 7: 'Summer', 8: 'Summer', 9: 'Fall', 10: 'Fall', 11: 'Fall', 12: 'Winter' }
+                            most_common_season = df['date'].dt.month.map(month_to_season).mode()[0]
+
 
                             statistics = {
                                 'Date Range': {
@@ -324,9 +414,11 @@ def analyze(request):
                                     'End': df['date'].max().strftime('%Y-%m-%d')
                                 },
                                 'Distribution': {
-                                    'Most Common Year': yearly_counts.index[0],
-                                    'Most Common Month': monthly_counts.index[0],
-                                    'Total Count': len(df)
+                                    'Most Common Year': most_common_year,
+                                    "Most Common Season" : most_common_season,
+                                    'Most Common Month': most_common_month,
+                                    'Most Common Day of Week': df['date'].dt.day_name().mode()[0],
+
                                 }
                             }
 
