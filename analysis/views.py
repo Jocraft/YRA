@@ -335,28 +335,44 @@ def analyze(request):
                 elif pd.api.types.is_numeric_dtype(df['column']):
                     # Numeric data visualization
                     if 'group_by' in df.columns:
-                        # Grouped numeric data
-                        fig = make_subplots(rows=1, cols=2,
-                                          subplot_titles=("Box Plot by Group",
-                                                        "Distribution by Group"))
-                        
-                        # Box plot
-                        fig.add_trace(go.Box(x=df['group_by'], y=df['column'],
-                                           name='Distribution'), row=1, col=1)
-                        
-                        # Violin plot
-                        for group in df['group_by'].unique():
-                            group_data = df[df['group_by'] == group]['column']
-                            fig.add_trace(go.Violin(x=[group] * len(group_data),
-                                                  y=group_data,
-                                                  name=str(group)), row=1, col=2)
-                        
-                        fig.update_layout(height=500, showlegend=False,
-                                        title_text=f"Analysis of {column} by {group_by}")
-                        
-                        statistics = df.groupby('group_by')['column'].describe().to_dict()
+                        if pd.api.types.is_numeric_dtype(df['group_by']):
+                            fig = make_subplots(rows=1, cols=1,
+                                                subplot_titles=("Scatter Plot by Group"))
+                            
+                            fig.add_trace(go.Scatter(x=df['group_by'], y=df['column'],
+                                                mode='markers', name='Data Points'))
+                            
+                            fig.update_layout(height=500, showlegend=False,
+                                            title_text=f"Scatter Plot of {column} in Y-axis by {group_by} in X-axis")
+                            
+                            correlation = df[['group_by', 'column']].corr().iloc[0, 1]  
+                            covariance_matrix = df[['group_by', 'column']].cov()  
+                            statistics = {}
+                            statistics['correlation'] = correlation
+                            statistics['covariance_matrix'] = covariance_matrix.to_dict()  
+                        else:
+                            # Grouped numeric data - Box and Violin plots for non-numeric grouping
+                            fig = make_subplots(rows=1, cols=2,
+                                                subplot_titles=("Box Plot by Group",
+                                                                "Distribution by Group"))
+                            
+                            # Box plot
+                            fig.add_trace(go.Box(x=df['group_by'], y=df['column'],
+                                            name='Distribution'), row=1, col=1)
+                            
+                            # Violin plot
+                            for group in df['group_by'].unique():
+                                group_data = df[df['group_by'] == group]['column']
+                                fig.add_trace(go.Violin(x=[group] * len(group_data),
+                                                        y=group_data,
+                                                        name=str(group)), row=1, col=2)
+                            
+                            fig.update_layout(height=500, showlegend=False,
+                                            title_text=f"Analysis of {column} by {group_by}")
+                            
+                            statistics = df.groupby('group_by')['column'].describe().to_dict()
                     else:
-                        # Non-grouped numeric data
+                        # Non-grouped numeric data (existing functionality)
                         from scipy import stats as scipy_stats
                         
                         basic_stats = df['column'].describe()
@@ -366,10 +382,10 @@ def analyze(request):
                         _, normality_p_value = scipy_stats.shapiro(df['column'])
                         
                         fig = make_subplots(rows=2, cols=2,
-                                          subplot_titles=("Distribution",
-                                                        "Box Plot",
-                                                        "Q-Q Plot",
-                                                        "Trend"))
+                                            subplot_titles=("Distribution",
+                                                            "Box Plot",
+                                                            "Q-Q Plot",
+                                                            "Trend"))
                         
                         # Histogram with normal curve
                         hist_data = df['column']
@@ -382,27 +398,27 @@ def analyze(request):
                         fig.add_trace(go.Histogram(x=hist_data, name="Frequency", nbinsx=30),
                                     row=1, col=1)
                         fig.add_trace(go.Scatter(x=bins_mean, y=pdf, name="Normal Fit",
-                                               line=dict(color='red')), row=1, col=1)
+                                            line=dict(color='red')), row=1, col=1)
                         
                         # Box plot
                         fig.add_trace(go.Box(y=df['column'], name=column,
-                                           boxpoints='outliers'), row=1, col=2)
+                                        boxpoints='outliers'), row=1, col=2)
                         
                         # Q-Q plot
                         qq = scipy_stats.probplot(df['column'], dist="norm")
                         fig.add_trace(go.Scatter(x=qq[0][0], y=qq[0][1],
-                                               mode='markers', name='Q-Q Plot'),
+                                            mode='markers', name='Q-Q Plot'),
                                     row=2, col=1)
                         
                         line_x = np.linspace(min(qq[0][0]), max(qq[0][0]), 100)
                         line_y = qq[1][0] * line_x + qq[1][1]
                         fig.add_trace(go.Scatter(x=line_x, y=line_y, mode='lines',
-                                               name='Normal Line',
-                                               line=dict(color='red')), row=2, col=1)
+                                            name='Normal Line',
+                                            line=dict(color='red')), row=2, col=1)
                         
                         # Trend plot
                         fig.add_trace(go.Scatter(y=df['column'], mode='markers+lines',
-                                               name='Trend'), row=2, col=2)
+                                            name='Trend'), row=2, col=2)
                         
                         fig.update_layout(height=800, showlegend=True,
                                         title_text=f"Analysis of {column}")
