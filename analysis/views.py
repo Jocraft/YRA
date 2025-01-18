@@ -265,7 +265,6 @@ def analyze(request):
 
                                 statistics = {
                                     'Year Statistics': {
-                                        'Total Count': len(df),
                                         'Group Totals (Month)': monthly_grouped.sum().to_dict(),
                                         'Group Totals (Day of Week)': day_of_week_grouped.sum().to_dict(),
                                         'Most Common Month by Group': {

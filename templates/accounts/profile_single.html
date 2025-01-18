@@ -137,7 +137,44 @@
                     <p><strong>{% trans 'Religion' %}:</strong> {{ user.religion }}</p>
                     <p><strong>{% trans 'Languages Spoken' %}:</strong> {{ user.languages_spoken }}</p>
                     </div>
+                
+                <hr> {# Separator between sections #}
 
+                <p class="fw-bold"><i class="me-2 fas fa-lightbulb"></i> {% trans 'Learning Methods' %}</p>
+                <div class="dashboard-description">
+                    {% if learning_methods %}
+                        <p><strong>{% trans 'Dominant Styles in Four Groups' %}:</strong> 
+                        {% if dominant_styles %}
+                            {% for style in dominant_styles %}
+                                {{ style }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {% trans 'No dominant styles found.' %}
+                        {% endif %}
+                        </p>
+                
+                        <p><strong>{% trans 'Combined Groups' %}:</strong>
+                        {% if combined_groups_percentage %}
+                            {% for group, value in combined_groups_percentage.items %}
+                                {% if value == max_value %}
+                                    <strong>{{ group }}: {{ value|floatformat:2 }}%</strong>{% if not forloop.last %}, {% endif %}
+                                {% else %}
+                                    {{ group }}: {{ value|floatformat:2 }}%{% if not forloop.last %}, {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {% trans 'No combined groups found.' %}
+                        {% endif %}
+                        </p>
+                
+                    {% else %}
+                        <p>{% trans 'No learning methods found.' %}</p>
+                    {% endif %}
+                </div>
+                
+                    
+                    
+                                                                        
             </div>
         </div>
     </div>

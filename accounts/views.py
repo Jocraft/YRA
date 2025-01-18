@@ -9,6 +9,9 @@ from django.utils.decorators import method_decorator
 from django.views.generic import CreateView
 from django_filters.views import FilterView
 from xhtml2pdf import pisa
+from matplotlib import pyplot as plt
+from io import BytesIO
+import base64
 
 from accounts.decorators import admin_required
 from accounts.filters import LecturerFilter, StudentFilter
@@ -20,6 +23,7 @@ from accounts.forms import (
 from accounts.models import  Student, User
 from core.models import Semester, Session
 from course.models import Course
+from learning_methods.models import LearningStyleTest
 # from course.models import TakenCourse  # If you have a TakenCourse model
 
 
@@ -103,12 +107,58 @@ def profile_single(request, user_id):
         is_current_semester=True, session=current_session
     ).first()
     user = get_object_or_404(User, pk=user_id)
+    student = get_object_or_404(Student, student=user)
+    learning_methods = LearningStyleTest.objects.filter(student=student).order_by('-date_taken').first()
+    percentages = {}
+    dominant_styles = []  
+    combined_groups = {}
+    combined_groups_percentage = {}
+    max_value = None
+    if learning_methods:
+        percentages = {
+            'V': learning_methods.visual_score,
+            'A': learning_methods.aural_score,
+            'R': learning_methods.read_write_score,
+            'K': learning_methods.kinesthetic_score,
+        }
+
+
+        va_score = percentages['V'] + percentages['A']
+        rk_score = percentages['R'] + percentages['K']
+        combined_groups['VA'] = va_score / 2  
+        combined_groups['RK'] = rk_score / 2  
+
+        conditions_met = 0
+        if max(percentages.values()) < 35:
+            conditions_met += 1
+        if min(percentages.values()) > 15:
+            conditions_met += 1
+        if abs(combined_groups['VA'] - combined_groups['RK']) < 25:
+            conditions_met += 1
+        if conditions_met >= 2:
+            combined_groups['S'] = sum(percentages.values()) / 4 * 1.05  
+
+        max_percentage = max(percentages.values())
+        
+        total_value = sum(combined_groups.values())
+
+        combined_groups_percentage = {group: (value / total_value) * 100 for group, value in combined_groups.items()}
+
+        max_percentage = max(percentages.values())
+        dominant_styles = [
+            style for style, pct in percentages.items() if pct == max_percentage
+        ]
+        max_value = max(combined_groups_percentage.values(), default=None)
 
     context = {
         "title": user.get_full_name,
         "user": user,
         "current_session": current_session,
         "current_semester": current_semester,
+        "learning_methods": learning_methods,
+        "dominant_styles": dominant_styles,
+        "combined_groups_percentage": combined_groups_percentage,  
+        "max_value": max_value, 
     }
 
     if user.is_lecturer:
