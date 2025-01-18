@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block title %}Bulk Upload Answers{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Bulk Upload Answers</h2>
+  <p>Please upload an Excel file in which each row has:</p>
+  <ul>
+    <li><strong>Timestamp</strong> (ignored)</li>
+    <li><strong>Name</strong> (ignored)</li>
+    <li><strong>ID</strong> (used to find the Student)</li>
+    <li><strong>Answers for Q1..Q16</strong></li>
+  </ul>
+  <p>Example format: <code>[Timestamp, Name, ID, Q1, Q2, ..., Q16]</code></p>
+    <!-- Google Form button (same as the single upload approach) -->
+    <div class="mb-3">
+        <a 
+          href="https://docs.google.com/forms/d/e/1FAIpQLScTi67R79_-xYM_VCK8X0PDEfauATWyDUVTYCYL634E94uMoA/viewform?usp=header"
+          class="btn btn-info"
+          target="_blank"
+        >
+          <i class="fas fa-pencil-alt"></i> Fill Out Google Form
+        </a>
+      </div>
+  <hr>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="excel_file" class="form-label">Select Excel File:</label>
+      <input
+        type="file"
+        class="form-control"
+        id="excel_file"
+        name="excel_file"
+        accept=".xlsx, .xls"
+        required
+      >
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-upload"></i> Upload
+    </button>
+  </form>
+</div>
+{% endblock %}
